@@ -1,0 +1,1559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Kono Paddock | Command Center</title>
+<meta name="description" content="Can you keep pace...">
+
+<!-- Supabase JS v2 -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+
+<!-- Fonts: Orbitron (Pit Wall display) + Inter (body) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ================================================================
+   CSS FOUNDATION — PETRONAS F1 PERFORMANCE AESTHETIC
+   ================================================================ */
+:root {
+  /* Obsidian / Carbon surfaces */
+  --carbon-950: #050505;
+  --carbon-900: #0B0B0B;
+  --carbon-850: #111111;
+  --carbon-800: #1A1A1A;
+  --carbon-750: #202020;
+  --carbon-700: #2A2A2A;
+  --carbon-600: #333333;
+  --carbon-500: #505050;
+  --carbon-400: #929292;
+  --carbon-300: #B0B0B0;
+  --carbon-200: #D0D0D0;
+  --carbon-100: #EEEEEE;
+
+  /* Petronas Teal — primary accent */
+  --teal:      #00A19B;
+  --teal-dim:  rgba(0, 161, 155, 0.10);
+  --teal-med:  rgba(0, 161, 155, 0.20);
+  --teal-hot:  rgba(0, 161, 155, 0.35);
+  --teal-glow: 0 0 12px rgba(0, 161, 155, 0.3), 0 0 4px rgba(0, 161, 155, 0.2);
+
+  /* F1 Red — critical / alerts only */
+  --red:       #E10600;
+  --red-dim:   rgba(225, 6, 0, 0.10);
+  --red-med:   rgba(225, 6, 0, 0.20);
+  --red-glow:  0 0 8px rgba(225, 6, 0, 0.25);
+
+  /* Silver Arrow */
+  --silver:    #929292;
+  --silver-dim:rgba(146, 146, 146, 0.10);
+
+  /* Supplementary */
+  --white:     #FFFFFF;
+  --green:     #00D26A;
+  --green-dim: rgba(0, 210, 106, 0.10);
+  --blue:      #0090FF;
+  --blue-dim:  rgba(0, 144, 255, 0.10);
+  --purple:    #9945FF;
+  --purple-dim:rgba(153, 69, 255, 0.10);
+  --rose:      #FF3366;
+  --rose-dim:  rgba(255, 51, 102, 0.10);
+
+  /* Typography */
+  --font-display: 'Orbitron', sans-serif;
+  --font-body:    'Inter', system-ui, sans-serif;
+
+  /* Layout */
+  --sidebar-w: 244px;
+  --topbar-h:  54px;
+  --r-sm: 3px;
+  --r-md: 5px;
+  --r-lg: 6px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { height: 100%; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--carbon-900);
+  color: var(--carbon-200);
+  height: 100%;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Carbon fiber weave texture */
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image:
+    repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px),
+    repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(255,255,255,0.008) 1px, rgba(255,255,255,0.008) 2px);
+  background-size: 4px 4px;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+::-webkit-scrollbar { width: 4px; height: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--carbon-600); border-radius: 2px; }
+::-webkit-scrollbar-thumb:hover { background: var(--teal); }
+
+button { font-family: inherit; cursor: pointer; }
+input, select, textarea { font-family: inherit; }
+
+/* ================================================================
+   AUTH SCREEN
+   ================================================================ */
+#auth-screen {
+  display: flex; align-items: center; justify-content: center;
+  height: 100vh;
+  background:
+    radial-gradient(ellipse at 30% 40%, rgba(0,161,155,0.06) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 70%, rgba(0,161,155,0.03) 0%, transparent 50%),
+    var(--carbon-950);
+}
+
+.auth-box {
+  width: 400px; padding: 40px;
+  background: var(--carbon-800);
+  border: 1px solid var(--carbon-700);
+  border-top: 2px solid var(--teal);
+  border-radius: var(--r-lg);
+  box-shadow: 0 30px 80px rgba(0,0,0,0.6), var(--teal-glow);
+}
+
+.auth-logo {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.auth-logo span { color: var(--teal); }
+
+.auth-sub {
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-style: italic;
+  color: var(--carbon-400);
+  margin-bottom: 30px;
+  font-weight: 300;
+  letter-spacing: 0.03em;
+}
+
+.auth-field { margin-bottom: 14px; }
+.auth-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  font-weight: 600;
+  color: var(--carbon-400);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  margin-bottom: 6px;
+}
+.auth-input {
+  width: 100%; padding: 11px 14px;
+  background: var(--carbon-900);
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-md);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 400;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.auth-input:focus { outline: none; border-color: var(--teal); box-shadow: var(--teal-glow); }
+.auth-input::placeholder { color: var(--carbon-500); }
+
+.auth-btn {
+  width: 100%; padding: 11px;
+  background: var(--teal);
+  color: var(--carbon-950);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-top: 8px;
+  transition: filter 0.15s, transform 0.1s, box-shadow 0.2s;
+}
+.auth-btn:hover { filter: brightness(1.15); box-shadow: var(--teal-glow); }
+.auth-btn:active { transform: scale(0.98); }
+.auth-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.auth-toggle { text-align: center; margin-top: 18px; font-size: 0.78rem; color: var(--carbon-400); }
+.auth-toggle a { color: var(--teal); cursor: pointer; text-decoration: none; font-weight: 500; }
+
+.auth-error { display: none; padding: 8px 12px; background: var(--red-dim); border: 1px solid var(--red-med); border-radius: var(--r-md); color: #ff9999; font-size: 0.78rem; margin-bottom: 12px; font-family: var(--font-body); }
+
+/* ================================================================
+   APP SHELL
+   ================================================================ */
+#app-shell {
+  display: none; height: 100vh;
+  grid-template-columns: var(--sidebar-w) 1fr;
+  grid-template-rows: var(--topbar-h) 1fr;
+}
+
+/* --- Sidebar --- */
+.sidebar {
+  grid-row: 1 / -1;
+  background: var(--carbon-850);
+  border-right: 1px solid var(--carbon-700);
+  display: flex; flex-direction: column; overflow-y: auto;
+}
+.sidebar-brand {
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--carbon-700);
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(0,161,155,0.04) 0%, transparent 100%);
+}
+.sidebar-brand h1 {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.sidebar-brand h1 span { color: var(--teal); }
+.sidebar-brand .mc {
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-style: italic;
+  color: var(--carbon-400);
+  margin-top: 3px;
+  font-weight: 300;
+}
+
+.sidebar-section { padding: 14px 10px 4px; }
+.sidebar-section-label {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: var(--carbon-500);
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  padding: 0 10px;
+  margin-bottom: 6px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 14px;
+  border-radius: var(--r-md);
+  color: var(--carbon-300);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.12s;
+  border: 1px solid transparent;
+  background: transparent;
+  width: 100%; text-align: left;
+}
+.nav-item:hover { background: var(--carbon-750); color: var(--white); }
+.nav-item.active {
+  background: var(--teal-dim);
+  color: var(--teal);
+  border-color: rgba(0,161,155,0.18);
+}
+
+.nav-icon { width: 18px; text-align: center; font-size: 0.82rem; flex-shrink: 0; }
+.nav-badge {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  font-weight: 700;
+  background: var(--red);
+  color: #fff;
+  padding: 2px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+.sidebar-footer { margin-top: auto; padding: 14px; border-top: 1px solid var(--carbon-700); flex-shrink: 0; }
+.user-info { display: flex; align-items: center; gap: 10px; padding: 6px 8px; }
+.user-avatar {
+  width: 30px; height: 30px;
+  background: var(--teal-med);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display); font-weight: 700; font-size: 0.6rem;
+  color: var(--teal); flex-shrink: 0;
+}
+.user-details { overflow: hidden; }
+.user-name { font-size: 0.78rem; font-weight: 600; color: var(--carbon-200); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 0.62rem; color: var(--carbon-500); font-family: var(--font-display); font-weight: 500; letter-spacing: 0.04em; text-transform: uppercase; }
+
+.btn-logout {
+  width: 100%; margin-top: 8px; padding: 6px;
+  background: transparent;
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-md);
+  color: var(--carbon-400);
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: all 0.15s;
+}
+.btn-logout:hover { border-color: var(--red-med); color: var(--red); background: var(--red-dim); }
+
+/* --- Topbar --- */
+.topbar {
+  background: var(--carbon-800);
+  border-bottom: 1px solid var(--carbon-700);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 24px;
+}
+.topbar-left { display: flex; align-items: center; gap: 14px; }
+.topbar-view-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.topbar-breadcrumb { font-family: var(--font-body); font-size: 0.72rem; color: var(--carbon-500); font-weight: 400; }
+.topbar-right { display: flex; align-items: center; gap: 14px; }
+.topbar-clock {
+  font-family: var(--font-display);
+  font-size: 0.62rem;
+  font-weight: 500;
+  color: var(--carbon-400);
+  letter-spacing: 0.06em;
+}
+
+.topbar-btn {
+  position: relative;
+  display: flex; align-items: center; justify-content: center;
+  width: 32px; height: 32px;
+  background: var(--carbon-750);
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-md);
+  color: var(--carbon-300);
+  font-size: 0.9rem;
+  transition: all 0.15s;
+}
+.topbar-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); box-shadow: var(--teal-glow); }
+.topbar-btn .notif-dot {
+  position: absolute; top: -2px; right: -2px;
+  width: 8px; height: 8px;
+  background: var(--red);
+  border-radius: 50%;
+  border: 2px solid var(--carbon-800);
+  display: none;
+  box-shadow: var(--red-glow);
+}
+
+/* --- Main --- */
+.main-area { background: var(--carbon-900); overflow-y: auto; position: relative; }
+.view-container { padding: 24px; max-width: 1400px; display: none; animation: viewFade 0.2s ease-out; }
+.view-container.active { display: block; }
+@keyframes viewFade { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Config notice */
+.config-notice {
+  display: none; margin: 24px 24px 0; padding: 14px 18px;
+  background: var(--teal-dim);
+  border: 1px solid rgba(0,161,155,0.2);
+  border-left: 3px solid var(--teal);
+  border-radius: var(--r-md);
+  font-size: 0.78rem; color: var(--teal); line-height: 1.7;
+}
+.config-notice code { background: rgba(0,0,0,0.4); padding: 1px 5px; border-radius: 3px; font-family: var(--font-display); font-size: 0.68rem; }
+
+@media (max-width: 900px) { .dashboard-panels { grid-template-columns: 1fr; } #app-shell { grid-template-columns: 1fr; } .sidebar { display: none; } }
+
+/* ================================================================
+   STAT CARDS
+   ================================================================ */
+.stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.stat-card {
+  background: var(--carbon-800);
+  border: 1px solid var(--carbon-700);
+  border-radius: var(--r-lg);
+  padding: 18px 20px;
+  position: relative; overflow: hidden;
+  transition: border-color 0.2s, transform 0.15s;
+}
+.stat-card:hover { border-color: var(--carbon-600); transform: translateY(-1px); }
+.stat-card::after { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+.stat-card[data-accent="red"]::after    { background: var(--red); }
+.stat-card[data-accent="teal"]::after   { background: var(--teal); }
+.stat-card[data-accent="green"]::after  { background: var(--green); }
+.stat-card[data-accent="blue"]::after   { background: var(--blue); }
+.stat-card[data-accent="purple"]::after { background: var(--purple); }
+.stat-card[data-accent="silver"]::after { background: linear-gradient(90deg, var(--teal), var(--silver)); }
+
+.stat-header {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--carbon-400);
+  margin-bottom: 10px;
+}
+.stat-number {
+  font-family: var(--font-display);
+  font-size: 1.9rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1;
+  color: var(--white);
+}
+.stat-number.text-teal  { color: var(--teal); }
+.stat-number.text-red   { color: var(--red); }
+.stat-number.text-green { color: var(--green); }
+.stat-number.text-blue  { color: var(--blue); }
+.stat-sub { font-size: 0.7rem; color: var(--carbon-500); margin-top: 5px; font-weight: 400; }
+
+/* ================================================================
+   PANELS & ENTRIES
+   ================================================================ */
+.section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+.section-title { font-family: var(--font-display); font-size: 0.56rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.12em; color: var(--carbon-400); }
+.section-action { font-family: var(--font-display); font-size: 0.56rem; font-weight: 600; color: var(--teal); background: none; border: none; cursor: pointer; padding: 4px 8px; border-radius: var(--r-sm); letter-spacing: 0.06em; text-transform: uppercase; transition: background 0.12s; }
+.section-action:hover { background: var(--teal-dim); }
+
+.dashboard-panels { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+
+.panel {
+  background: var(--carbon-800);
+  border: 1px solid var(--carbon-700);
+  border-radius: var(--r-lg);
+  display: flex; flex-direction: column;
+  max-height: 420px;
+}
+.panel-head {
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--carbon-700);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.panel-label { font-family: var(--font-display); font-size: 0.56rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--carbon-400); }
+.panel-count { font-family: var(--font-display); font-size: 0.52rem; font-weight: 600; color: var(--carbon-500); background: var(--carbon-750); padding: 2px 8px; border-radius: var(--r-sm); }
+.panel-body { flex: 1; overflow-y: auto; padding: 6px; }
+
+/* Entry rows */
+.entry-row {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  transition: background 0.1s;
+  cursor: pointer;
+  border: 1px solid transparent;
+}
+.entry-row:hover { background: var(--carbon-750); border-color: var(--carbon-600); }
+.entry-row.resolved .entry-text { opacity: 0.35; text-decoration: line-through; }
+
+.domain-dot { width: 6px; height: 6px; border-radius: 50%; margin-top: 7px; flex-shrink: 0; }
+.domain-dot.legal      { background: var(--teal); box-shadow: 0 0 6px rgba(0,161,155,0.4); }
+.domain-dot.financial   { background: var(--green); }
+.domain-dot.operations  { background: var(--blue); }
+.domain-dot.hr          { background: var(--purple); }
+.domain-dot.personal    { background: var(--rose); }
+.domain-dot.general     { background: var(--carbon-500); }
+
+.entry-body { flex: 1; min-width: 0; }
+.entry-meta-line { display: flex; align-items: center; gap: 6px; margin-bottom: 3px; }
+.entry-domain-tag { font-family: var(--font-display); font-size: 0.48rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: var(--carbon-400); }
+
+.priority-pip {
+  font-family: var(--font-display);
+  font-size: 0.46rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.06em;
+}
+.priority-pip.critical { background: var(--red-dim); color: var(--red); }
+.priority-pip.high     { background: var(--teal-dim); color: var(--teal); }
+.priority-pip.medium   { background: var(--blue-dim); color: var(--blue); }
+.priority-pip.low      { background: var(--silver-dim); color: var(--silver); }
+
+.entry-time-tag { margin-left: auto; font-family: var(--font-display); font-size: 0.5rem; font-weight: 500; color: var(--carbon-500); }
+.entry-text { font-size: 0.82rem; color: var(--carbon-200); line-height: 1.5; word-break: break-word; font-weight: 400; }
+
+/* Deadline rows */
+.deadline-row {
+  padding: 10px 14px;
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--teal);
+  background: var(--carbon-750);
+  margin: 4px 6px;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.deadline-row:hover { background: var(--carbon-700); }
+.deadline-row.overdue { border-left-color: var(--red); background: var(--red-dim); }
+.deadline-row.urgent  { border-left-color: #FF6B00; }
+.deadline-date { font-family: var(--font-display); font-size: 0.54rem; font-weight: 600; color: var(--teal); margin-bottom: 3px; letter-spacing: 0.04em; }
+.deadline-row.overdue .deadline-date { color: var(--red); }
+.deadline-title { font-size: 0.82rem; color: var(--carbon-200); font-weight: 500; }
+.deadline-sub { font-size: 0.7rem; color: var(--carbon-500); margin-top: 1px; }
+
+.panel-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: var(--carbon-500); text-align: center; }
+.panel-empty .empty-icon { font-size: 1.8rem; opacity: 0.25; margin-bottom: 8px; }
+.panel-empty p { font-size: 0.78rem; }
+
+/* ================================================================
+   PADDOCK INTAKE — TEAM RADIO STYLE
+   ================================================================ */
+.capture-terminal {
+  background: var(--carbon-800);
+  border: 1px solid var(--carbon-700);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  margin-bottom: 20px;
+  position: relative;
+}
+/* Teal top-edge glow */
+.capture-terminal::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--teal), transparent);
+  opacity: 0.6;
+}
+
+.terminal-bar {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 18px;
+  background: var(--carbon-750);
+  border-bottom: 1px solid var(--carbon-700);
+}
+.terminal-dots { display: flex; gap: 5px; }
+.terminal-dots span { width: 7px; height: 7px; border-radius: 50%; background: var(--carbon-600); }
+.terminal-dots span:first-child { background: var(--red); opacity: 0.8; }
+.terminal-dots span:nth-child(2) { background: var(--teal); opacity: 0.8; }
+.terminal-dots span:last-child { background: var(--green); opacity: 0.8; }
+.terminal-label {
+  font-family: var(--font-display);
+  font-size: 0.52rem;
+  font-weight: 600;
+  color: var(--carbon-500);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.terminal-body { padding: 22px; }
+.capture-prompt { display: flex; align-items: flex-start; gap: 14px; }
+.prompt-caret {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--teal);
+  font-weight: 700;
+  margin-top: 10px;
+  flex-shrink: 0;
+  text-shadow: var(--teal-glow);
+  animation: caretPulse 2s ease-in-out infinite;
+}
+@keyframes caretPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+.capture-textarea {
+  flex: 1;
+  background: transparent;
+  border: none;
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.92rem;
+  font-weight: 400;
+  line-height: 1.6;
+  resize: none;
+  min-height: 60px;
+  padding: 8px 0;
+}
+.capture-textarea:focus { outline: none; }
+.capture-textarea::placeholder { color: var(--carbon-600); font-style: italic; }
+
+/* Parser suggestion */
+.parse-suggestion {
+  display: none;
+  margin-top: 14px;
+  padding: 12px 16px;
+  background: var(--carbon-750);
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-md);
+  animation: viewFade 0.15s ease-out;
+}
+.parse-suggestion.visible { display: block; }
+.parse-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.parse-label { font-family: var(--font-display); font-size: 0.48rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; color: var(--carbon-500); flex-shrink: 0; }
+
+.parse-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px;
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 600;
+  border: 1px solid transparent;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.parse-chip.domain-legal      { background: var(--teal-dim); color: var(--teal); }
+.parse-chip.domain-financial  { background: var(--green-dim); color: var(--green); }
+.parse-chip.domain-operations { background: var(--blue-dim); color: var(--blue); }
+.parse-chip.domain-hr         { background: var(--purple-dim); color: var(--purple); }
+.parse-chip.domain-personal   { background: var(--rose-dim); color: var(--rose); }
+.parse-chip.domain-general    { background: var(--silver-dim); color: var(--silver); }
+.parse-chip.priority-critical { background: var(--red-dim); color: var(--red); }
+.parse-chip.priority-high     { background: var(--teal-dim); color: var(--teal); }
+.parse-chip.priority-medium   { background: var(--blue-dim); color: var(--blue); }
+.parse-chip.priority-low      { background: var(--silver-dim); color: var(--silver); }
+.parse-chip.flag-type         { background: var(--green-dim); color: var(--green); }
+.parse-amount { font-family: var(--font-display); font-size: 0.72rem; font-weight: 700; color: var(--green); }
+
+.capture-actions {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 16px; padding-top: 14px;
+  border-top: 1px solid var(--carbon-700);
+}
+.capture-overrides { display: flex; gap: 8px; }
+.override-select {
+  padding: 6px 10px;
+  background: var(--carbon-900);
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-md);
+  color: var(--carbon-300);
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+.override-select:focus { outline: none; border-color: var(--teal); }
+
+.capture-submit {
+  display: flex; align-items: center; gap: 6px;
+  padding: 8px 22px;
+  background: var(--teal);
+  color: var(--carbon-950);
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: filter 0.12s, transform 0.1s, box-shadow 0.2s;
+}
+.capture-submit:hover { filter: brightness(1.15); box-shadow: var(--teal-glow); }
+.capture-submit:active { transform: scale(0.97); }
+.capture-submit .kbd { font-size: 0.5rem; opacity: 0.5; padding: 1px 4px; background: rgba(0,0,0,0.2); border-radius: 2px; }
+
+.capture-log { background: var(--carbon-800); border: 1px solid var(--carbon-700); border-radius: var(--r-lg); }
+
+/* ================================================================
+   DATA TABLES (Legal / Financial)
+   ================================================================ */
+.data-table-wrap { background: var(--carbon-800); border: 1px solid var(--carbon-700); border-radius: var(--r-lg); overflow: hidden; margin-bottom: 20px; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.data-table thead { background: var(--carbon-750); }
+.data-table th {
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--carbon-400);
+  text-align: left;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--carbon-700);
+  white-space: nowrap;
+}
+.data-table td { padding: 10px 14px; border-bottom: 1px solid var(--carbon-700); color: var(--carbon-200); vertical-align: middle; }
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: var(--carbon-750); }
+.data-table .mono { font-family: var(--font-display); font-size: 0.7rem; font-weight: 500; }
+.data-table .amount { font-family: var(--font-display); font-weight: 700; color: var(--green); }
+
+.status-badge {
+  display: inline-flex; padding: 2px 8px; border-radius: 2px;
+  font-family: var(--font-display); font-size: 0.5rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.status-badge.pending     { background: var(--teal-dim); color: var(--teal); }
+.status-badge.in_progress { background: var(--blue-dim); color: var(--blue); }
+.status-badge.completed   { background: var(--green-dim); color: var(--green); }
+.status-badge.blocked     { background: var(--red-dim); color: var(--red); }
+
+.row-action-btn {
+  padding: 4px 10px;
+  background: transparent;
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-sm);
+  color: var(--carbon-400);
+  font-size: 0.58rem;
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.row-action-btn:hover { border-color: var(--teal); color: var(--teal); box-shadow: var(--teal-glow); }
+
+/* Tab bar */
+.tab-bar {
+  display: flex; gap: 2px;
+  margin-bottom: 18px;
+  background: var(--carbon-800);
+  padding: 3px;
+  border-radius: var(--r-md);
+  border: 1px solid var(--carbon-700);
+  width: fit-content;
+}
+.tab-btn {
+  padding: 7px 18px;
+  background: transparent;
+  border: none;
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  font-weight: 600;
+  color: var(--carbon-400);
+  cursor: pointer;
+  transition: all 0.12s;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.tab-btn:hover { color: var(--white); }
+.tab-btn.active { background: var(--teal-dim); color: var(--teal); }
+.sub-view { display: none; }
+.sub-view.active { display: block; }
+
+/* ================================================================
+   RACE ENGINEERING BRIEFINGS (AI Insights Overlay)
+   ================================================================ */
+.insights-overlay {
+  position: fixed; top: 0; right: -400px; bottom: 0;
+  width: 390px;
+  background: var(--carbon-800);
+  border-left: 1px solid var(--carbon-700);
+  z-index: 100;
+  display: flex; flex-direction: column;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -8px 0 50px rgba(0,0,0,0.5);
+}
+.insights-overlay.open { right: 0; }
+/* Teal left-edge accent when open */
+.insights-overlay::before {
+  content: '';
+  position: absolute; top: 0; left: 0; bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, var(--teal), transparent);
+  opacity: 0.5;
+}
+
+.insights-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; display: none; backdrop-filter: blur(3px); }
+.insights-backdrop.visible { display: block; }
+
+.insights-header {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--carbon-700);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+  background: linear-gradient(180deg, rgba(0,161,155,0.04) 0%, transparent 100%);
+}
+.insights-title {
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--carbon-300);
+  display: flex; align-items: center; gap: 7px;
+}
+.insights-title .spark { color: var(--teal); text-shadow: var(--teal-glow); }
+
+.insights-close {
+  width: 28px; height: 28px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent;
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-sm);
+  color: var(--carbon-400);
+  font-size: 0.82rem;
+  transition: all 0.12s;
+}
+.insights-close:hover { border-color: var(--red); color: var(--red); }
+.insights-body { flex: 1; overflow-y: auto; padding: 12px; }
+
+.insight-card {
+  padding: 14px;
+  border-radius: var(--r-md);
+  margin-bottom: 8px;
+  border: 1px solid var(--carbon-600);
+  background: var(--carbon-750);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.insight-card:hover { border-color: var(--teal); transform: translateX(-2px); }
+.insight-card.highlighted { border-color: var(--teal); background: var(--teal-dim); box-shadow: var(--teal-glow); }
+
+.insight-type-label {
+  font-family: var(--font-display);
+  font-size: 0.48rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  display: flex; align-items: center; gap: 4px;
+}
+.insight-type-label.deadline_warning { color: var(--red); }
+.insight-type-label.pattern          { color: var(--blue); }
+.insight-type-label.suggestion       { color: var(--teal); }
+.insight-type-label.anomaly          { color: var(--rose); }
+
+.insight-content { font-size: 0.82rem; color: var(--carbon-200); line-height: 1.55; margin-bottom: 8px; font-weight: 400; }
+.insight-footer { display: flex; align-items: center; justify-content: space-between; }
+.insight-time { font-family: var(--font-display); font-size: 0.5rem; font-weight: 500; color: var(--carbon-500); }
+.insight-ack {
+  padding: 3px 10px;
+  background: transparent;
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-sm);
+  font-family: var(--font-display);
+  font-size: 0.5rem;
+  font-weight: 600;
+  color: var(--carbon-400);
+  cursor: pointer;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.12s;
+}
+.insight-ack:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+
+.insights-generate {
+  margin: 12px;
+  padding: 10px;
+  background: var(--teal-dim);
+  border: 1px dashed rgba(0,161,155,0.3);
+  border-radius: var(--r-md);
+  color: var(--teal);
+  font-family: var(--font-display);
+  font-size: 0.58rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.insights-generate:hover { background: var(--teal-med); box-shadow: var(--teal-glow); }
+
+/* ================================================================
+   TOASTS
+   ================================================================ */
+.toasts { position: fixed; bottom: 20px; right: 20px; z-index: 200; display: flex; flex-direction: column; gap: 6px; }
+.toast-item {
+  padding: 10px 16px;
+  background: var(--carbon-750);
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-md);
+  font-size: 0.78rem;
+  color: var(--carbon-200);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+  animation: toastIn 0.25s ease-out;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font-body);
+}
+.toast-item.success { border-left: 3px solid var(--green); }
+.toast-item.error   { border-left: 3px solid var(--red); }
+.toast-item.info    { border-left: 3px solid var(--teal); }
+@keyframes toastIn { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+.spinner-sm { width: 18px; height: 18px; border: 2px solid var(--carbon-600); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.6s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.panel-loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
+</style>
+</head>
+<body>
+
+<!-- AUTH SCREEN -->
+<div id="auth-screen">
+  <div class="auth-box">
+    <div class="auth-logo">THE KONO <span>PADDOCK</span></div>
+    <div class="auth-sub">Can you keep pace...</div>
+    <div id="auth-error" class="auth-error"></div>
+    <div class="auth-field">
+      <label class="auth-label">Email</label>
+      <input type="email" id="auth-email" class="auth-input" placeholder="driver@konopaddock.com" autocomplete="email">
+    </div>
+    <div class="auth-field">
+      <label class="auth-label">Password</label>
+      <input type="password" id="auth-pass" class="auth-input" placeholder="••••••••" autocomplete="current-password">
+    </div>
+    <button id="auth-btn" class="auth-btn">LIGHTS OUT</button>
+    <div class="auth-toggle"><span id="auth-mode-text">Need paddock access?</span> <a id="auth-mode-link">Request credentials</a></div>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div id="app-shell">
+  <nav class="sidebar">
+    <div class="sidebar-brand"><h1>THE KONO <span>PADDOCK</span></h1><div class="mc">Can you keep pace...</div></div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Pit Wall</div>
+      <button class="nav-item active" data-view="dashboard"><span class="nav-icon">&#9670;</span> Dashboard</button>
+      <button class="nav-item" data-view="capture"><span class="nav-icon">&#9655;</span> Paddock Intake</button>
+      <button class="nav-item" data-view="legal"><span class="nav-icon">&#9878;</span> Legal Tracker</button>
+      <button class="nav-item" data-view="financial"><span class="nav-icon">$</span> Financial Flags</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Race Engineering</div>
+      <button class="nav-item" id="nav-insights-btn" onclick="toggleInsights()"><span class="nav-icon">&#9880;</span> Briefings <span class="nav-badge" id="nav-insight-badge" style="display:none">0</span></button>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="user-avatar">AK</div>
+        <div class="user-details"><div class="user-name" id="user-display-name">Adam Konopko</div><div class="user-role">Team Principal</div></div>
+      </div>
+      <button class="btn-logout" onclick="doLogout()">End Session</button>
+    </div>
+  </nav>
+
+  <header class="topbar">
+    <div class="topbar-left">
+      <span class="topbar-view-title" id="topbar-title">Dashboard</span>
+      <span class="topbar-breadcrumb" id="topbar-crumb">pit wall overview</span>
+    </div>
+    <div class="topbar-right">
+      <span class="topbar-clock" id="topbar-clock"></span>
+      <button class="topbar-btn" onclick="toggleInsights()" title="Race Engineering Briefings">&#9880;<span class="notif-dot" id="topbar-insight-dot"></span></button>
+    </div>
+  </header>
+
+  <main class="main-area">
+    <div class="config-notice" id="config-notice">Running in <strong>demo mode</strong>. Set <code>SUPABASE_URL</code> + <code>SUPABASE_ANON_KEY</code> in the MARTA_CONFIG block.</div>
+
+    <!-- DASHBOARD -->
+    <div class="view-container active" id="view-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card" data-accent="red"><div class="stat-header">CRITICAL FLAGS</div><div class="stat-number text-red" id="s-critical">0</div><div class="stat-sub">require immediate action</div></div>
+        <div class="stat-card" data-accent="teal"><div class="stat-header">LEGAL DEADLINES</div><div class="stat-number text-teal" id="s-deadlines">0</div><div class="stat-sub">within 7 days</div></div>
+        <div class="stat-card" data-accent="green"><div class="stat-header">FLAGGED AMOUNT</div><div class="stat-number text-green" id="s-flagged">$0</div><div class="stat-sub">pending review</div></div>
+        <div class="stat-card" data-accent="blue"><div class="stat-header">OPEN ENTRIES</div><div class="stat-number text-blue" id="s-entries">0</div><div class="stat-sub">unresolved</div></div>
+        <div class="stat-card" data-accent="purple"><div class="stat-header">ACTIVE CREW</div><div class="stat-number" id="s-employees">0</div><div class="stat-sub">on roster</div></div>
+        <div class="stat-card" data-accent="silver"><div class="stat-header">BRIEFINGS</div><div class="stat-number text-teal" id="s-insights">0</div><div class="stat-sub">unread</div></div>
+      </div>
+      <div class="dashboard-panels">
+        <div class="panel"><div class="panel-head"><span class="panel-label">Live Telemetry</span><span class="panel-count" id="dash-entry-ct">0</span></div><div class="panel-body" id="dash-entries-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div></div>
+        <div class="panel"><div class="panel-head"><span class="panel-label">Upcoming Pit Stops</span><span class="panel-count" id="dash-deadline-ct">0</span></div><div class="panel-body" id="dash-deadlines-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div></div>
+      </div>
+    </div>
+
+    <!-- PADDOCK INTAKE (Quick Capture) -->
+    <div class="view-container" id="view-capture">
+      <div class="capture-terminal">
+        <div class="terminal-bar"><div class="terminal-dots"><span></span><span></span><span></span></div><span class="terminal-label">KONO://team-radio</span></div>
+        <div class="terminal-body">
+          <div class="capture-prompt">
+            <span class="prompt-caret">&#9655;</span>
+            <textarea id="capture-input" class="capture-textarea" rows="3" placeholder="e.g. Check bond claim from Zurich for $3,200 — need docs by Friday"></textarea>
+          </div>
+          <div class="parse-suggestion" id="parse-box"><div class="parse-row" id="parse-content"></div></div>
+          <div class="capture-actions">
+            <div class="capture-overrides">
+              <select id="override-domain" class="override-select"><option value="">Auto Sector</option><option value="legal">Legal</option><option value="financial">Financial</option><option value="operations">Operations</option><option value="hr">HR</option><option value="personal">Personal</option><option value="general">General</option></select>
+              <select id="override-priority" class="override-select"><option value="">Auto Priority</option><option value="critical">Critical</option><option value="high">High</option><option value="medium">Medium</option><option value="low">Low</option></select>
+            </div>
+            <button class="capture-submit" onclick="submitCapture()">TRANSMIT <span class="kbd">Ctrl+Enter</span></button>
+          </div>
+        </div>
+      </div>
+      <div class="section-header"><span class="section-title">Recent Transmissions</span><button class="section-action" onclick="loadRecentEntries()">Refresh</button></div>
+      <div class="capture-log panel"><div class="panel-body" id="capture-log-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div></div>
+    </div>
+
+    <!-- LEGAL -->
+    <div class="view-container" id="view-legal">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-subtab="deadlines" data-parent="legal">Deadlines</button>
+        <button class="tab-btn" data-subtab="matters" data-parent="legal">Matters</button>
+        <button class="tab-btn" data-subtab="comms" data-parent="legal">Communications</button>
+      </div>
+      <div class="sub-view active" id="sub-deadlines"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Deadline</th><th>Title</th><th>Case</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody id="legal-deadlines-tbody"><tr><td colspan="6"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
+      <div class="sub-view" id="sub-matters"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Type</th><th>Court</th><th>Attorney</th><th>Status</th></tr></thead><tbody id="legal-matters-tbody"><tr><td colspan="5"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
+      <div class="sub-view" id="sub-comms"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Subject</th><th>CC'd?</th><th>Flagged</th></tr></thead><tbody id="legal-comms-tbody"><tr><td colspan="6"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- FINANCIAL -->
+    <div class="view-container" id="view-financial">
+      <div class="tab-bar">
+        <button class="tab-btn active" data-subtab="flags" data-parent="financial">Open Flags</button>
+        <button class="tab-btn" data-subtab="resolved" data-parent="financial">Resolved</button>
+      </div>
+      <div class="sub-view active" id="sub-flags"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Type</th><th>Title</th><th>Vendor</th><th>Amount</th><th>Source</th><th>Status</th><th></th></tr></thead><tbody id="financial-flags-tbody"><tr><td colspan="7"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
+      <div class="sub-view" id="sub-resolved"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Type</th><th>Title</th><th>Amount</th><th>Resolved</th><th>Resolution</th></tr></thead><tbody id="financial-resolved-tbody"><tr><td colspan="5"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
+    </div>
+  </main>
+</div>
+
+<!-- RACE ENGINEERING BRIEFINGS OVERLAY -->
+<div class="insights-backdrop" id="insights-backdrop" onclick="toggleInsights()"></div>
+<div class="insights-overlay" id="insights-panel">
+  <div class="insights-header"><span class="insights-title"><span class="spark">&#9880;</span> Race Engineering Briefings</span><button class="insights-close" onclick="toggleInsights()">&#10005;</button></div>
+  <div class="insights-body" id="insights-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div>
+  <button class="insights-generate" onclick="generateInsight()">&#9880; Request Briefing</button>
+</div>
+
+<div class="toasts" id="toasts"></div>
+
+<script>
+// ================================================================
+// CONFIGURATION — UPDATE THESE TWO VALUES
+// ================================================================
+const MARTA_CONFIG = {
+  SUPABASE_URL:      'https://hpprebdyvnfczplaaych.supabase.co',
+  SUPABASE_ANON_KEY: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhwcHJlYmR5dm5mY3pwbGFheWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI2NDg1NDIsImV4cCI6MjA4ODIyNDU0Mn0.annq3o5VHq7I6yIuzW47WGplitc80v6o96RRraU6Bek',
+  EDGE_FN_URL:       'https://hpprebdyvnfczplaaych.supabase.co/functions/v1/generate-insights',
+};
+
+// ================================================================
+// STATE
+// ================================================================
+let sb = null, user = null, isDemo = false, currentView = 'dashboard';
+const demo = { entries: [], deadlines: [], matters: [], comms: [], flags: [], insights: [] };
+
+// ================================================================
+// BOOT
+// ================================================================
+(function boot() {
+  startClock();
+  if (MARTA_CONFIG.SUPABASE_URL === 'YOUR_SUPABASE_URL') {
+    isDemo = true;
+    document.getElementById('config-notice').style.display = 'block';
+    enterApp();
+    return;
+  }
+  try {
+    sb = window.supabase.createClient(MARTA_CONFIG.SUPABASE_URL, MARTA_CONFIG.SUPABASE_ANON_KEY);
+    sb.auth.getSession().then(function(r) { if (r.data.session) { user = r.data.session.user; enterApp(); } });
+  } catch (e) { isDemo = true; enterApp(); }
+})();
+
+function startClock() {
+  var tick = function() {
+    var now = new Date();
+    var el = document.getElementById('topbar-clock');
+    if (el) el.textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}) + ' \u00b7 ' + now.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  };
+  tick(); setInterval(tick, 1000);
+}
+
+// ================================================================
+// AUTH
+// ================================================================
+var authMode = 'signin';
+document.getElementById('auth-btn').addEventListener('click', doAuth);
+document.getElementById('auth-pass').addEventListener('keydown', function(e) { if (e.key==='Enter') doAuth(); });
+document.getElementById('auth-mode-link').addEventListener('click', function() {
+  authMode = authMode === 'signin' ? 'signup' : 'signin';
+  document.getElementById('auth-btn').textContent = authMode === 'signin' ? 'LIGHTS OUT' : 'JOIN THE GRID';
+  document.getElementById('auth-mode-text').textContent = authMode === 'signin' ? 'Need paddock access?' : 'Already on the grid?';
+  document.getElementById('auth-mode-link').textContent = authMode === 'signin' ? 'Request credentials' : 'Sign in';
+});
+
+async function doAuth() {
+  if (isDemo) { enterApp(); return; }
+  var email = document.getElementById('auth-email').value.trim();
+  var pass = document.getElementById('auth-pass').value;
+  if (!email || !pass) { showAuthError('Credentials required for paddock access.'); return; }
+  var btn = document.getElementById('auth-btn');
+  btn.disabled = true; btn.textContent = 'CONNECTING...';
+  try {
+    var res = authMode === 'signin'
+      ? await sb.auth.signInWithPassword({ email: email, password: pass })
+      : await sb.auth.signUp({ email: email, password: pass });
+    if (res.error) throw res.error;
+    user = res.data.user; enterApp(); toast('Connected to paddock', 'success');
+  } catch (e) { showAuthError(e.message || 'Auth failed'); }
+  finally { btn.disabled = false; btn.textContent = authMode === 'signin' ? 'LIGHTS OUT' : 'JOIN THE GRID'; }
+}
+
+function showAuthError(msg) { var el = document.getElementById('auth-error'); el.textContent = msg; el.style.display = 'block'; }
+
+async function doLogout() {
+  if (!isDemo && sb) await sb.auth.signOut();
+  user = null;
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-shell').style.display = 'none';
+}
+
+function enterApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-shell').style.display = 'grid';
+  if (user) {
+    var init = (user.email || 'U').substring(0, 2).toUpperCase();
+    document.getElementById('user-avatar').textContent = init;
+    document.getElementById('user-display-name').textContent = user.email;
+  }
+  if (isDemo) seedDemoData();
+  loadDashboard(); loadInsights();
+  if (!isDemo && sb) subscribeRealtime();
+}
+
+// ================================================================
+// VIEW ROUTER
+// ================================================================
+var viewTitles = { dashboard: ['Dashboard','pit wall overview'], capture: ['Paddock Intake','team radio'], legal: ['Legal Tracker','cases \u00b7 deadlines \u00b7 comms'], financial: ['Financial Flags','audit \u00b7 disputes \u00b7 claims'] };
+
+document.querySelectorAll('.nav-item[data-view]').forEach(function(btn) {
+  btn.addEventListener('click', function() { switchView(btn.dataset.view); });
+});
+
+function switchView(view) {
+  currentView = view;
+  document.querySelectorAll('.nav-item[data-view]').forEach(function(n) { n.classList.remove('active'); });
+  var activeNav = document.querySelector('.nav-item[data-view="'+view+'"]');
+  if (activeNav) activeNav.classList.add('active');
+  var info = viewTitles[view] || [view, ''];
+  document.getElementById('topbar-title').textContent = info[0];
+  document.getElementById('topbar-crumb').textContent = info[1];
+  document.querySelectorAll('.view-container').forEach(function(v) { v.classList.remove('active'); });
+  var viewEl = document.getElementById('view-'+view);
+  if (viewEl) viewEl.classList.add('active');
+  if (view === 'dashboard') loadDashboard();
+  if (view === 'capture') { loadRecentEntries(); setTimeout(function(){ document.getElementById('capture-input').focus(); }, 100); }
+  if (view === 'legal') loadLegalData();
+  if (view === 'financial') loadFinancialData();
+}
+
+document.querySelectorAll('.tab-btn[data-subtab]').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    var parent = btn.dataset.parent, sub = btn.dataset.subtab;
+    document.querySelectorAll('.tab-btn[data-parent="'+parent+'"]').forEach(function(t) { t.classList.remove('active'); });
+    btn.classList.add('active');
+    document.getElementById('view-'+parent).querySelectorAll('.sub-view').forEach(function(s) { s.classList.remove('active'); });
+    document.getElementById('sub-'+sub).classList.add('active');
+  });
+});
+
+// ================================================================
+// QUICK CAPTURE PARSER
+// ================================================================
+var PARSE_RULES = {
+  domain: [
+    { p: /\b(custody|hearing|motion|discovery|gal|guardian|olechno|wolfe|janes|hudzik|blacha|ofw|family.wizard|judge|court|filing|deposition|subpoena|parenting|visitation)\b/i, d: 'legal' },
+    { p: /\b(bond.claim|duplicate.payment|quickbooks|qb|tms|invoice|reconcil|audit|payment|billing|overcharge|credit|debit|refund|accounts?.(?:payable|receivable))\b/i, d: 'financial' },
+    { p: /\b(carrier|load|shipment|freight|dispatch|delivery|barcel|alpha.baking|temperature|reefer|trailer|driver|lane|ltl|ftl|broker|shipper|consignee|bol|pod)\b/i, d: 'operations' },
+    { p: /\b(employee|onboard|hire|fire|terminat|resign|w.?4|i.?9|payroll|intern|commission|separation|pto|time.off|nda|background.check)\b/i, d: 'hr' },
+    { p: /\b(kaleesi|marta|ashley|primrose|nanny|alivia|detailing|elite.studio|midlothian|country.club|personal|family|co.?parent|pickup|dropoff)\b/i, d: 'personal' },
+  ],
+  priority: [
+    { p: /\b(urgent|asap|immediately|critical|emergency|overdue|past.due|time.sensitive|escalat)\b/i, v: 'critical' },
+    { p: /\b(important|high.priority|deadline|by.(eow|eod|friday|monday|tomorrow|tonight|end.of))\b/i, v: 'high' },
+    { p: /\b(review|check|follow.up|schedule|prepare|update|monitor)\b/i, v: 'medium' },
+    { p: /\b(fyi|low.priority|when.possible|someday|nice.to|non.?urgent)\b/i, v: 'low' },
+  ],
+  flagType: [
+    { p: /\b(duplicate.payment|double.(pay|charge|bill))\b/i, t: 'duplicate_payment' },
+    { p: /\b(bond.claim|surety|zurich|insurance.claim)\b/i, t: 'bond_claim' },
+    { p: /\b(billing.(dispute|issue|error)|overcharg|incorrect.(bill|invoice))\b/i, t: 'billing_dispute' },
+    { p: /\b(reconcil|mismatch|discrepancy|variance)\b/i, t: 'reconciliation' },
+    { p: /\b(audit|finding|irregularity|compliance)\b/i, t: 'audit_finding' },
+  ],
+  amount: /\$[\d,]+(?:\.\d{2})?/,
+  tags: [
+    { p: /\b(kaleesi|custody|marta|parenting)\b/i, t: 'family' },
+    { p: /\b(wolfe|olechno|janes|hudzik|blacha|attorney|counsel)\b/i, t: 'legal-counsel' },
+    { p: /\b(bond|claim|surety|zurich)\b/i, t: 'bond-claim' },
+    { p: /\b(duplicate|quickbooks|tms|reconcil)\b/i, t: 'financial-controls' },
+    { p: /\b(barcel|alpha.baking|grupo.bimbo)\b/i, t: 'key-client' },
+    { p: /\b(ashley|samantha|dominick|braschler|stover|duque|drilinga)\b/i, t: 'personnel' },
+  ],
+};
+
+function parseInput(text) {
+  if (!text.trim()) return null;
+  var domain = 'general', priority = 'medium', flagType = null, amount = null, tags = [];
+  for (var i = 0; i < PARSE_RULES.domain.length; i++) { if (PARSE_RULES.domain[i].p.test(text)) { domain = PARSE_RULES.domain[i].d; break; } }
+  var po = ['critical','high','medium','low'];
+  for (var i = 0; i < PARSE_RULES.priority.length; i++) { if (PARSE_RULES.priority[i].p.test(text) && po.indexOf(PARSE_RULES.priority[i].v) < po.indexOf(priority)) priority = PARSE_RULES.priority[i].v; }
+  for (var i = 0; i < PARSE_RULES.flagType.length; i++) { if (PARSE_RULES.flagType[i].p.test(text)) { flagType = PARSE_RULES.flagType[i].t; break; } }
+  var am = text.match(PARSE_RULES.amount); if (am) amount = am[0];
+  for (var i = 0; i < PARSE_RULES.tags.length; i++) { if (PARSE_RULES.tags[i].p.test(text) && tags.indexOf(PARSE_RULES.tags[i].t) === -1) tags.push(PARSE_RULES.tags[i].t); }
+  return { domain: domain, priority: priority, flagType: flagType, amount: amount, tags: tags, isActionable: priority === 'critical' || priority === 'high' };
+}
+
+var captureInput = document.getElementById('capture-input');
+var parseTimer = null;
+captureInput.addEventListener('input', function() { clearTimeout(parseTimer); parseTimer = setTimeout(renderParsePreview, 200); });
+
+function renderParsePreview() {
+  var text = captureInput.value;
+  var box = document.getElementById('parse-box');
+  var content = document.getElementById('parse-content');
+  if (!text.trim()) { box.classList.remove('visible'); return; }
+  var parsed = parseInput(text);
+  if (!parsed) { box.classList.remove('visible'); return; }
+  var h = '';
+  h += '<span class="parse-label">Sector:</span><span class="parse-chip domain-'+parsed.domain+'">'+parsed.domain+'</span>';
+  h += '<span class="parse-label" style="margin-left:12px">Priority:</span><span class="parse-chip priority-'+parsed.priority+'">'+parsed.priority+'</span>';
+  if (parsed.flagType) h += '<span class="parse-label" style="margin-left:12px">Flag:</span><span class="parse-chip flag-type">'+parsed.flagType.replace(/_/g,' ')+'</span>';
+  if (parsed.amount) h += '<span class="parse-label" style="margin-left:12px">Amount:</span><span class="parse-amount">'+parsed.amount+'</span>';
+  if (parsed.tags.length) { h += '<span class="parse-label" style="margin-left:12px">Tags:</span>'; parsed.tags.forEach(function(t){ h += '<span class="parse-chip domain-general">#'+t+'</span>'; }); }
+  content.innerHTML = h;
+  box.classList.add('visible');
+}
+
+// ================================================================
+// SUBMIT CAPTURE
+// ================================================================
+async function submitCapture() {
+  var text = captureInput.value.trim();
+  if (!text) return;
+  var parsed = parseInput(text) || { domain: 'general', priority: 'medium', tags: [], isActionable: false };
+  var od = document.getElementById('override-domain').value;
+  var op = document.getElementById('override-priority').value;
+  if (od) parsed.domain = od;
+  if (op) parsed.priority = op;
+  var entry = { content: text, domain: parsed.domain, priority: parsed.priority, is_actionable: parsed.isActionable, tags: parsed.tags, resolved: false, metadata: {} };
+  if (parsed.flagType) entry.metadata.flag_type = parsed.flagType;
+  if (parsed.amount) entry.metadata.amount = parsed.amount;
+
+  if (isDemo) {
+    entry.id = crypto.randomUUID(); entry.created_at = new Date().toISOString();
+    demo.entries.unshift(entry);
+    toast('Transmitted \u2192 ' + parsed.domain, 'success');
+    captureInput.value = ''; document.getElementById('parse-box').classList.remove('visible');
+    document.getElementById('override-domain').value = ''; document.getElementById('override-priority').value = '';
+    loadRecentEntries(); return;
+  }
+  try {
+    var r = await sb.from('entries').insert(Object.assign({}, entry, { user_id: user.id }));
+    if (r.error) throw r.error;
+    toast('Transmitted \u2192 ' + parsed.domain, 'success');
+    captureInput.value = ''; document.getElementById('parse-box').classList.remove('visible');
+    document.getElementById('override-domain').value = ''; document.getElementById('override-priority').value = '';
+    loadRecentEntries();
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+document.addEventListener('keydown', function(e) {
+  if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && currentView === 'capture') { e.preventDefault(); submitCapture(); }
+  if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); switchView('capture'); }
+});
+
+// ================================================================
+// DATA LOADERS
+// ================================================================
+async function loadDashboard() {
+  if (isDemo) { renderDashboard(demo); return; }
+  try {
+    var r1 = await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(30);
+    var r2 = await sb.from('legal_deadlines').select('*, legal_matters(case_name)').eq('completed',false).order('deadline_date',{ascending:true}).limit(15);
+    var r3 = await sb.from('tasks').select('id').eq('status','pending').eq('priority','critical');
+    var r4 = await sb.from('financial_flags').select('amount').eq('status','pending');
+    var r5 = await sb.from('ai_insights').select('id').eq('acknowledged',false);
+    var r6 = await sb.from('employees').select('id').eq('is_active',true);
+    var entries = r1.data || [], deadlines = r2.data || [];
+    var flagAmt = (r4.data||[]).reduce(function(s,f){return s+(parseFloat(f.amount)||0);},0);
+    var dlCount = deadlines.filter(function(d){return (new Date(d.deadline_date)-new Date())/86400000<=7;}).length;
+    renderStats({critical:(r3.data||[]).length, deadlines:dlCount, flagged:flagAmt, openEntries:entries.filter(function(e){return !e.resolved;}).length, employees:(r6.data||[]).length, insights:(r5.data||[]).length});
+    renderDashEntries(entries); renderDashDeadlines(deadlines);
+  } catch(e){console.error('Dashboard:',e);}
+}
+
+function renderDashboard(d) {
+  renderStats({critical:d.entries.filter(function(e){return e.priority==='critical'&&!e.resolved;}).length, deadlines:d.deadlines.filter(function(x){return !x.completed;}).length, flagged:d.flags.filter(function(f){return f.status==='pending';}).reduce(function(s,f){return s+(f.amount||0);},0), openEntries:d.entries.filter(function(e){return !e.resolved;}).length, employees:3, insights:d.insights.filter(function(i){return !i.acknowledged;}).length});
+  renderDashEntries(d.entries); renderDashDeadlines(d.deadlines);
+}
+
+function renderStats(s) {
+  document.getElementById('s-critical').textContent = s.critical;
+  document.getElementById('s-deadlines').textContent = s.deadlines;
+  document.getElementById('s-flagged').textContent = '$' + Number(s.flagged).toLocaleString();
+  document.getElementById('s-entries').textContent = s.openEntries;
+  document.getElementById('s-employees').textContent = s.employees;
+  document.getElementById('s-insights').textContent = s.insights;
+  var badge = document.getElementById('nav-insight-badge'), dot = document.getElementById('topbar-insight-dot');
+  if (s.insights > 0) { badge.style.display='inline'; badge.textContent=s.insights; dot.style.display='block'; }
+  else { badge.style.display='none'; dot.style.display='none'; }
+}
+
+function renderDashEntries(entries) {
+  var el = document.getElementById('dash-entries-list');
+  document.getElementById('dash-entry-ct').textContent = entries.length;
+  if (!entries.length) { el.innerHTML = '<div class="panel-empty"><div class="empty-icon">&#9670;</div><p>No telemetry. Use Paddock Intake.</p></div>'; return; }
+  el.innerHTML = entries.slice(0,20).map(function(e){ return entryRowHTML(e); }).join('');
+}
+
+function renderDashDeadlines(deadlines) {
+  var el = document.getElementById('dash-deadlines-list');
+  document.getElementById('dash-deadline-ct').textContent = deadlines.length;
+  if (!deadlines.length) { el.innerHTML = '<div class="panel-empty"><div class="empty-icon">&#128197;</div><p>No pit stops scheduled.</p></div>'; return; }
+  el.innerHTML = deadlines.map(function(d) {
+    var days = Math.ceil((new Date(d.deadline_date)-new Date())/86400000);
+    var cls = days<0?'overdue':days<=2?'urgent':'';
+    var label = days<0?'OVERDUE ('+Math.abs(days)+'d)':days===0?'TODAY':days===1?'TOMORROW':days+' days';
+    var ds = new Date(d.deadline_date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    var cn = (d.legal_matters&&d.legal_matters.case_name)?d.legal_matters.case_name:(d.description||'');
+    return '<div class="deadline-row '+cls+'"><div class="deadline-date">'+ds+' \u00b7 '+label+'</div><div class="deadline-title">'+esc(d.title)+'</div>'+(cn?'<div class="deadline-sub">'+esc(cn)+'</div>':'')+'</div>';
+  }).join('');
+}
+
+// Recent entries
+async function loadRecentEntries() {
+  var el = document.getElementById('capture-log-list');
+  if (isDemo) { el.innerHTML = demo.entries.length ? demo.entries.slice(0,25).map(function(e){return entryRowHTML(e,true);}).join('') : '<div class="panel-empty"><div class="empty-icon">&#9655;</div><p>Transmissions appear here.</p></div>'; return; }
+  try { var r = await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(25); el.innerHTML = (r.data||[]).length ? r.data.map(function(e){return entryRowHTML(e,true);}).join('') : '<div class="panel-empty"><p>No entries yet.</p></div>'; }
+  catch(e){ el.innerHTML = '<div class="panel-empty"><p>Error loading.</p></div>'; }
+}
+
+function entryRowHTML(e, resolve) {
+  return '<div class="entry-row '+(e.resolved?'resolved':'')+'" '+(resolve?'onclick="toggleResolve(\''+e.id+'\')"':'')+'><span class="domain-dot '+e.domain+'"></span><div class="entry-body"><div class="entry-meta-line"><span class="entry-domain-tag">'+e.domain+'</span><span class="priority-pip '+e.priority+'">'+e.priority+'</span><span class="entry-time-tag">'+timeAgo(e.created_at)+'</span></div><div class="entry-text">'+esc(e.content)+'</div></div></div>';
+}
+
+async function toggleResolve(id) {
+  if (isDemo) { var e = demo.entries.find(function(x){return x.id===id;}); if(e){e.resolved=!e.resolved;} loadRecentEntries(); loadDashboard(); return; }
+  var r = await sb.from('entries').select('resolved').eq('id',id).single();
+  if (r.data) { await sb.from('entries').update({resolved:!r.data.resolved, resolved_at:!r.data.resolved?new Date().toISOString():null}).eq('id',id); loadRecentEntries(); loadDashboard(); }
+}
+
+// ================================================================
+// LEGAL DATA
+// ================================================================
+async function loadLegalData() {
+  if (isDemo) { renderLegalDeadlines(demo.deadlines); renderLegalMatters(demo.matters); renderLegalComms(demo.comms); return; }
+  try {
+    var r1 = await sb.from('legal_deadlines').select('*, legal_matters(case_name)').order('deadline_date',{ascending:true}).limit(50);
+    var r2 = await sb.from('legal_matters').select('*').order('created_at',{ascending:false});
+    var r3 = await sb.from('legal_communications').select('*, legal_matters(case_name)').order('communication_date',{ascending:false}).limit(50);
+    renderLegalDeadlines(r1.data||[]); renderLegalMatters(r2.data||[]); renderLegalComms(r3.data||[]);
+  } catch(e){console.error('Legal:',e);}
+}
+
+function renderLegalDeadlines(rows) {
+  var tb = document.getElementById('legal-deadlines-tbody');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="6"><div class="panel-empty"><p>No deadlines</p></div></td></tr>'; return; }
+  tb.innerHTML = rows.map(function(d) {
+    var date = new Date(d.deadline_date).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});
+    var cn = (d.legal_matters&&d.legal_matters.case_name)?d.legal_matters.case_name:'\u2014';
+    return '<tr><td class="mono">'+date+'</td><td>'+esc(d.title)+'</td><td>'+esc(cn)+'</td><td><span class="priority-pip '+d.priority+'">'+d.priority+'</span></td><td>'+(d.completed?'<span class="status-badge completed">done</span>':'<span class="status-badge pending">open</span>')+'</td><td><button class="row-action-btn" onclick="toggleDeadline(\''+d.id+'\','+d.completed+')">'+(d.completed?'Reopen':'Complete')+'</button></td></tr>';
+  }).join('');
+}
+
+async function toggleDeadline(id, current) {
+  if (isDemo) { var d = demo.deadlines.find(function(x){return x.id===id;}); if(d)d.completed=!current; loadLegalData(); loadDashboard(); return; }
+  await sb.from('legal_deadlines').update({completed:!current,completed_at:!current?new Date().toISOString():null}).eq('id',id);
+  loadLegalData(); loadDashboard();
+}
+
+function renderLegalMatters(rows) {
+  var tb = document.getElementById('legal-matters-tbody');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="5"><div class="panel-empty"><p>No cases</p></div></td></tr>'; return; }
+  tb.innerHTML = rows.map(function(m) {
+    return '<tr><td>'+esc(m.case_name)+'</td><td class="mono">'+(m.case_type||'').replace(/_/g,' ')+'</td><td>'+esc(m.court||'\u2014')+'</td><td>'+esc(m.attorney_name||'\u2014')+'</td><td><span class="status-badge '+(m.status||'')+'">'+(m.status||'').replace(/_/g,' ')+'</span></td></tr>';
+  }).join('');
+}
+
+function renderLegalComms(rows) {
+  var tb = document.getElementById('legal-comms-tbody');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="6"><div class="panel-empty"><p>No communications</p></div></td></tr>'; return; }
+  tb.innerHTML = rows.map(function(c) {
+    var date = new Date(c.communication_date).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+    return '<tr><td class="mono">'+date+'</td><td>'+esc(c.from_party)+'</td><td>'+esc(c.to_party)+'</td><td>'+esc(c.subject||c.summary||'\u2014')+'</td><td>'+(c.was_copied?'<span style="color:var(--green)">\u2713</span>':'<span style="color:var(--red);font-weight:700">\u2717 NO</span>')+'</td><td>'+(c.flagged?'<span style="color:var(--red)">\u2691</span>':'\u2014')+'</td></tr>';
+  }).join('');
+}
+
+// ================================================================
+// FINANCIAL DATA
+// ================================================================
+async function loadFinancialData() {
+  if (isDemo) { renderFinancialFlags(demo.flags.filter(function(f){return f.status==='pending';})); renderResolvedFlags(demo.flags.filter(function(f){return f.status!=='pending';})); return; }
+  try {
+    var r1 = await sb.from('financial_flags').select('*').eq('status','pending').order('created_at',{ascending:false});
+    var r2 = await sb.from('financial_flags').select('*').neq('status','pending').order('resolved_at',{ascending:false}).limit(50);
+    renderFinancialFlags(r1.data||[]); renderResolvedFlags(r2.data||[]);
+  } catch(e){console.error('Financial:',e);}
+}
+
+function renderFinancialFlags(rows) {
+  var tb = document.getElementById('financial-flags-tbody');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="7"><div class="panel-empty"><p>No open flags</p></div></td></tr>'; return; }
+  tb.innerHTML = rows.map(function(f) {
+    return '<tr><td class="mono">'+(f.flag_type||'').replace(/_/g,' ')+'</td><td>'+esc(f.title)+'</td><td>'+esc(f.vendor||'\u2014')+'</td><td class="amount">$'+Number(f.amount||0).toLocaleString()+'</td><td class="mono">'+esc(f.source_system||'\u2014')+'</td><td><span class="status-badge '+(f.status||'')+'">'+(f.status||'').replace(/_/g,' ')+'</span></td><td><button class="row-action-btn" onclick="resolveFlag(\''+f.id+'\')">Resolve</button></td></tr>';
+  }).join('');
+}
+
+function renderResolvedFlags(rows) {
+  var tb = document.getElementById('financial-resolved-tbody');
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="5"><div class="panel-empty"><p>No resolved flags</p></div></td></tr>'; return; }
+  tb.innerHTML = rows.map(function(f) {
+    var date = f.resolved_at ? new Date(f.resolved_at).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '\u2014';
+    return '<tr><td class="mono">'+(f.flag_type||'').replace(/_/g,' ')+'</td><td>'+esc(f.title)+'</td><td class="amount">$'+Number(f.amount||0).toLocaleString()+'</td><td class="mono">'+date+'</td><td>'+esc(f.resolution_notes||'\u2014')+'</td></tr>';
+  }).join('');
+}
+
+async function resolveFlag(id) {
+  var notes = prompt('Resolution notes (optional):');
+  if (notes === null) return;
+  if (isDemo) { var f = demo.flags.find(function(x){return x.id===id;}); if(f){f.status='completed';f.resolved_at=new Date().toISOString();f.resolution_notes=notes;} loadFinancialData(); loadDashboard(); toast('Flag resolved','success'); return; }
+  await sb.from('financial_flags').update({status:'completed',resolved_at:new Date().toISOString(),resolution_notes:notes||null}).eq('id',id);
+  loadFinancialData(); loadDashboard(); toast('Flag resolved','success');
+}
+
+// ================================================================
+// RACE ENGINEERING BRIEFINGS (AI Insights)
+// ================================================================
+var insightsOpen = false;
+function toggleInsights() {
+  insightsOpen = !insightsOpen;
+  document.getElementById('insights-panel').classList.toggle('open', insightsOpen);
+  document.getElementById('insights-backdrop').classList.toggle('visible', insightsOpen);
+  if (insightsOpen) loadInsights();
+}
+
+async function loadInsights() {
+  var el = document.getElementById('insights-list');
+  if (isDemo) { renderInsightCards(demo.insights); return; }
+  try { var r = await sb.from('ai_insights').select('*').eq('acknowledged',false).order('created_at',{ascending:false}).limit(20); renderInsightCards(r.data||[]); }
+  catch(e){ el.innerHTML = '<div class="panel-empty"><p>Error loading briefings.</p></div>'; }
+}
+
+function renderInsightCards(insights) {
+  var el = document.getElementById('insights-list');
+  if (!insights.length) { el.innerHTML = '<div class="panel-empty" style="padding:60px 20px"><div class="empty-icon">&#9880;</div><p>No unread briefings. Request one below.</p></div>'; return; }
+  el.innerHTML = insights.map(function(i) {
+    var typeIcons = {deadline_warning:'\u23f0',pattern:'\ud83d\udcca',suggestion:'\ud83d\udca1',anomaly:'\u26a0'};
+    return '<div class="insight-card" id="insight-'+i.id+'" onclick="highlightInsight(\''+i.id+'\')"><div class="insight-type-label '+(i.insight_type||'suggestion')+'">'+(typeIcons[i.insight_type]||'\u2726')+' '+(i.insight_type||'suggestion').replace(/_/g,' ')+(i.severity==='critical'?' \u00b7 <span style="color:var(--red)">RED FLAG</span>':'')+'</div><div class="insight-content">'+esc(i.content||i.title)+'</div><div class="insight-footer"><span class="insight-time">'+timeAgo(i.created_at)+'</span><button class="insight-ack" onclick="event.stopPropagation();ackInsight(\''+i.id+'\')">\u2713 Copy</button></div></div>';
+  }).join('');
+}
+
+function highlightInsight(id) {
+  document.querySelectorAll('.insight-card').forEach(function(c){c.classList.remove('highlighted');});
+  var card = document.getElementById('insight-'+id);
+  if (card) card.classList.add('highlighted');
+}
+
+async function ackInsight(id) {
+  if (isDemo) { demo.insights = demo.insights.filter(function(i){return i.id!==id;}); renderInsightCards(demo.insights); loadDashboard(); toast('Briefing acknowledged','success'); return; }
+  await sb.from('ai_insights').update({acknowledged:true,acknowledged_at:new Date().toISOString()}).eq('id',id);
+  loadInsights(); loadDashboard(); toast('Briefing acknowledged','success');
+}
+
+async function generateInsight() {
+  if (isDemo) {
+    var pool = [
+      {type:'deadline_warning',severity:'high',content:'No legal entries in 4 days. Your hearing on Case 2025FA000577 is approaching \u2014 review prep with Mr. Wolfe.'},
+      {type:'pattern',severity:'medium',content:'Financial flags spiked 60% this week: 3 new duplicate payment findings all trace to Monday TMS batch export.'},
+      {type:'anomaly',severity:'critical',content:'Nicole Janes sent a motion response to Wolfe without CC\'ing you \u2014 3rd occurrence. Document for hearing.'},
+      {type:'suggestion',severity:'medium',content:'Kaleesi\'s Primrose enrollment was logged 12 days ago with no GAL follow-up. Send transparency report to Hudzik.'},
+      {type:'suggestion',severity:'low',content:'Alpha Baking rate review is Tuesday. 2 temperature deviations logged for that account \u2014 prepare mitigation data.'},
+      {type:'pattern',severity:'high',content:'2 new bond claims in 10 days from the same carrier. Check cumulative exposure against surety limits.'},
+    ];
+    var pick = pool[Math.floor(Math.random()*pool.length)];
+    demo.insights.unshift({id:crypto.randomUUID(),insight_type:pick.type,title:pick.type.replace(/_/g,' '),content:pick.content,severity:pick.severity,acknowledged:false,created_at:new Date().toISOString()});
+    renderInsightCards(demo.insights); loadDashboard(); toast('Briefing received','info'); return;
+  }
+  if (!MARTA_CONFIG.EDGE_FN_URL) { toast('Edge Function URL not configured','error'); return; }
+  toast('Requesting briefing...','info');
+  try {
+    var sess = await sb.auth.getSession();
+    var res = await fetch(MARTA_CONFIG.EDGE_FN_URL, {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sess.data.session.access_token},body:JSON.stringify({action:'generate_insight'})});
+    if (!res.ok) throw new Error('Edge function error '+res.status);
+    toast('Briefing received','success'); loadInsights(); loadDashboard();
+  } catch(e){ toast('Engineering error: '+e.message,'error'); }
+}
+
+// ================================================================
+// REALTIME
+// ================================================================
+function subscribeRealtime() {
+  if (isDemo || !sb) return;
+  sb.channel('kono-live')
+    .on('postgres_changes',{event:'*',schema:'public',table:'entries'},function(){if(currentView==='dashboard')loadDashboard();if(currentView==='capture')loadRecentEntries();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},function(){if(currentView==='dashboard')loadDashboard();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'ai_insights'},function(){loadInsights();if(currentView==='dashboard')loadDashboard();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'financial_flags'},function(){if(currentView==='financial')loadFinancialData();if(currentView==='dashboard')loadDashboard();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'legal_deadlines'},function(){if(currentView==='legal')loadLegalData();if(currentView==='dashboard')loadDashboard();})
+    .subscribe();
+}
+
+// ================================================================
+// DEMO SEED
+// ================================================================
+function seedDemoData() {
+  var now = Date.now(), H = 3600000;
+  demo.entries = [
+    {id:crypto.randomUUID(),content:'Wolfe confirmed receipt of full Olechno case file \u2014 reviewing billing discrepancies from Dec 11 entry',domain:'legal',priority:'high',resolved:false,is_actionable:true,tags:['legal-counsel'],created_at:new Date(now-H*1).toISOString()},
+    {id:crypto.randomUUID(),content:'QuickBooks duplicate payment flagged: Vendor #4412, $3,200 \u2014 matches TMS load #LR-9847',domain:'financial',priority:'critical',resolved:false,is_actionable:true,tags:['financial-controls'],created_at:new Date(now-H*3).toISOString()},
+    {id:crypto.randomUUID(),content:'Barcel USA temperature deviation on load BRC-0447 \u2014 carrier J&M Transport notified, awaiting sensor logs',domain:'operations',priority:'high',resolved:false,is_actionable:true,tags:['key-client'],created_at:new Date(now-H*5).toISOString()},
+    {id:crypto.randomUUID(),content:'Ashley Duque W-4 and I-9 received. Direct deposit form pending. Target payroll start: next cycle.',domain:'hr',priority:'medium',resolved:false,is_actionable:false,tags:['personnel'],created_at:new Date(now-H*8).toISOString()},
+    {id:crypto.randomUUID(),content:'Kaleesi Friday pickup confirmed 5:30pm from Primrose. Ashley covering office until 6.',domain:'personal',priority:'medium',resolved:false,is_actionable:false,tags:['family'],created_at:new Date(now-H*10).toISOString()},
+    {id:crypto.randomUUID(),content:'Bond claim from Zurich Insurance on carrier MC-892441. $7,800 claimed. Need POD and rate confirmation docs by EOW.',domain:'financial',priority:'critical',resolved:false,is_actionable:true,tags:['bond-claim'],created_at:new Date(now-H*14).toISOString()},
+    {id:crypto.randomUUID(),content:'Nicole Janes sent motion response to Wolfe \u2014 was NOT CC\'d on correspondence. Third occurrence. Flagged.',domain:'legal',priority:'critical',resolved:false,is_actionable:true,tags:['legal-counsel'],created_at:new Date(now-H*18).toISOString()},
+    {id:crypto.randomUUID(),content:'Alpha Baking lane review meeting scheduled Tuesday 2pm. Prep rate comparison and 90-day volume data.',domain:'operations',priority:'medium',resolved:false,is_actionable:false,tags:['key-client'],created_at:new Date(now-H*24).toISOString()},
+    {id:crypto.randomUUID(),content:'Dominick Drilinga submitted detention audit: 14 loads with undocumented charges totaling $4,100.',domain:'financial',priority:'high',resolved:false,is_actionable:true,tags:['financial-controls','personnel'],created_at:new Date(now-H*30).toISOString()},
+    {id:crypto.randomUUID(),content:'MSG-3 Logistics utility dispute: Marcin Ziolko provided no contractual basis for $280/mo surcharge. Demand letter sent.',domain:'legal',priority:'medium',resolved:true,resolved_at:new Date(now-H*20).toISOString(),is_actionable:false,tags:[],created_at:new Date(now-H*48).toISOString()},
+  ];
+  demo.deadlines = [
+    {id:crypto.randomUUID(),title:'Zurich Bond Claim Documentation Package',deadline_date:new Date(now-H*36).toISOString(),priority:'critical',completed:false,legal_matters:{case_name:'Surety Bond \u2014 MC# 971343'}},
+    {id:crypto.randomUUID(),title:'Discovery Response \u2014 Konopko v. Cichowicz',deadline_date:new Date(now+H*20).toISOString(),priority:'critical',completed:false,legal_matters:{case_name:'2025FA000577 \u2014 DuPage County'}},
+    {id:crypto.randomUUID(),title:'GAL Parent Information Sheet \u2014 Hudzik',deadline_date:new Date(now+H*96).toISOString(),priority:'high',completed:false,legal_matters:{case_name:'2025FA000577 \u2014 DuPage County'}},
+    {id:crypto.randomUUID(),title:'Alpha Baking Rate Analysis',deadline_date:new Date(now+H*140).toISOString(),priority:'medium',completed:false,legal_matters:{case_name:'Operations \u2014 Rate Review'}},
+  ];
+  demo.matters = [
+    {id:crypto.randomUUID(),case_name:'Konopko v. Cichowicz',case_type:'custody',court:'DuPage County',case_number:'2025FA000577',attorney_name:'Mr. Wolfe',opposing_counsel:'Nicole Janes',status:'in_progress'},
+    {id:crypto.randomUUID(),case_name:'US Cargo Brokers Bond Claims',case_type:'bond_claim',court:'\u2014',case_number:'MC# 971343',attorney_name:'\u2014',status:'in_progress'},
+    {id:crypto.randomUUID(),case_name:'MSG-3 Logistics Sublease Dispute',case_type:'contract',court:'Will County',attorney_name:'\u2014',status:'completed'},
+  ];
+  demo.comms = [
+    {id:crypto.randomUUID(),from_party:'Nicole Janes',to_party:'Mr. Wolfe',subject:'Motion Response \u2014 Parenting Schedule',was_copied:false,flagged:true,communication_date:new Date(now-H*18).toISOString()},
+    {id:crypto.randomUUID(),from_party:'Mr. Wolfe',to_party:'Adam Konopko',subject:'Case File Review \u2014 Olechno Transfer',was_copied:true,flagged:false,communication_date:new Date(now-H*4).toISOString()},
+    {id:crypto.randomUUID(),from_party:'Michael Hudzik (GAL)',to_party:'Mr. Wolfe / Nicole Janes',subject:'Home Visit Scheduling',was_copied:true,flagged:false,communication_date:new Date(now-H*72).toISOString()},
+  ];
+  demo.flags = [
+    {id:crypto.randomUUID(),flag_type:'duplicate_payment',title:'Vendor #4412 \u2014 Load LR-9847',vendor:'Midwest Freight LLC',amount:3200,source_system:'quickbooks',status:'pending',created_at:new Date(now-H*3).toISOString()},
+    {id:crypto.randomUUID(),flag_type:'bond_claim',title:'Carrier MC-892441 Damage Claim',vendor:'Zurich Insurance',amount:7800,source_system:'manual',status:'pending',created_at:new Date(now-H*14).toISOString()},
+    {id:crypto.randomUUID(),flag_type:'audit_finding',title:'Undocumented Detention \u2014 14 Loads',vendor:'Various',amount:4100,source_system:'tms',status:'pending',created_at:new Date(now-H*30).toISOString()},
+    {id:crypto.randomUUID(),flag_type:'billing_dispute',title:'MSG-3 Utility Surcharge',vendor:'MSG-3 Logistics',amount:1680,source_system:'manual',status:'completed',resolved_at:new Date(now-H*20).toISOString(),resolution_notes:'No contractual basis. Demand letter sent.'},
+    {id:crypto.randomUUID(),flag_type:'duplicate_payment',title:'Vendor #3891 \u2014 Load LR-8822',vendor:'Express Haul Inc',amount:1450,source_system:'quickbooks',status:'completed',resolved_at:new Date(now-H*100).toISOString(),resolution_notes:'Duplicate confirmed. ACH reversal initiated.'},
+  ];
+  demo.insights = [];
+}
+
+// ================================================================
+// UTILITIES
+// ================================================================
+function timeAgo(ds) {
+  var diff = (Date.now()-new Date(ds).getTime())/1000;
+  if (diff<60) return 'now';
+  if (diff<3600) return Math.floor(diff/60)+'m';
+  if (diff<86400) return Math.floor(diff/3600)+'h';
+  if (diff<604800) return Math.floor(diff/86400)+'d';
+  return new Date(ds).toLocaleDateString('en-US',{month:'short',day:'numeric'});
+}
+
+function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+
+function toast(msg, type) {
+  type = type || 'info';
+  var c = document.getElementById('toasts');
+  var el = document.createElement('div');
+  el.className = 'toast-item ' + type;
+  var icons = {success:'\u2713',error:'\u2717',info:'\u25cf'};
+  el.innerHTML = '<span>'+(icons[type]||'\u25cf')+'</span> '+esc(msg);
+  c.appendChild(el);
+  setTimeout(function(){ el.style.opacity='0'; el.style.transition='opacity 0.3s'; setTimeout(function(){el.remove();},300); },3500);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+name: MARTA Engine — Deploy & Sync
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Daily at 6 AM CT (11:00 UTC) — Morning briefing data sync
+    - cron: '0 11 * * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'deploy'
+        type: choice
+        options:
+          - deploy
+          - sync-backup
+          - generate-insights
+
+# Sets permissions for GitHub Pages deployment
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  # =============================================================
+  # JOB 1: Deploy to GitHub Pages
+  # =============================================================
+  deploy:
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'deploy')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: '.'
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+  # =============================================================
+  # JOB 2: Nightly Data Backup
+  # Exports Supabase data to a JSON snapshot in the repo
+  # =============================================================
+  sync-backup:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'sync-backup')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Supabase client
+        run: npm install @supabase/supabase-js
+
+      - name: Export data snapshot
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          node << 'EOF'
+          const { createClient } = require('@supabase/supabase-js');
+          const fs = require('fs');
+
+          const supabase = createClient(
+            process.env.SUPABASE_URL,
+            process.env.SUPABASE_SERVICE_KEY
+          );
+
+          async function backup() {
+            const tables = [
+              'entries', 'legal_matters', 'legal_deadlines',
+              'financial_flags', 'tasks', 'ai_insights'
+            ];
+
+            const snapshot = {
+              exported_at: new Date().toISOString(),
+              tables: {}
+            };
+
+            for (const table of tables) {
+              const { data, error } = await supabase
+                .from(table)
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(500);
+
+              if (error) {
+                console.error(`Error backing up ${table}:`, error.message);
+                snapshot.tables[table] = { error: error.message, count: 0 };
+              } else {
+                snapshot.tables[table] = { count: data.length, data };
+                console.log(`✓ ${table}: ${data.length} rows`);
+              }
+            }
+
+            // Write snapshot
+            const dir = 'backups';
+            if (!fs.existsSync(dir)) fs.mkdirSync(dir);
+            const filename = `${dir}/snapshot-${new Date().toISOString().split('T')[0]}.json`;
+            fs.writeFileSync(filename, JSON.stringify(snapshot, null, 2));
+            console.log(`\n✓ Snapshot saved to ${filename}`);
+
+            // Also write latest.json for quick access
+            fs.writeFileSync(`${dir}/latest.json`, JSON.stringify(snapshot, null, 2));
+          }
+
+          backup().catch(console.error);
+          EOF
+
+      - name: Commit backup
+        run: |
+          git config user.name "MARTA Bot"
+          git config user.email "bot@marta.engine"
+          git add backups/
+          git diff --cached --quiet || git commit -m "📦 Daily backup: $(date +%Y-%m-%d)"
+          git push
+
+  # =============================================================
+  # JOB 3: AI Insight Generation (via Supabase Edge Function)
+  # Triggers the Edge Function to analyze recent data and
+  # generate proactive suggestions using Claude API
+  # =============================================================
+  generate-insights:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && github.event.inputs.action == 'generate-insights')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger AI Analysis
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SERVICE_KEY: ${{ secrets.SUPABASE_SERVICE_KEY }}
+        run: |
+          curl -s -X POST \
+            "${SUPABASE_URL}/functions/v1/generate-insights" \
+            -H "Authorization: Bearer ${SUPABASE_SERVICE_KEY}" \
+            -H "Content-Type: application/json" \
+            -d '{"source": "github-actions", "analysis_type": "daily-briefing"}' \
+            | jq .
+
+          echo "✓ AI insight generation triggered"
