@@ -1556,6 +1556,138 @@ input, select, textarea { font-family: inherit; }
 .legal-action-bar .view-add-btn { font-size: 0.52rem; padding: 8px 14px; min-height: 40px; }
 .matter-row-actions { display: flex; gap: 4px; }
 .matter-row-actions .row-action-btn { font-size: 0.5rem; padding: 3px 8px; min-height: 32px; }
+
+/* ================================================================
+   CALENDAR VIEW
+   ================================================================ */
+.cal-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px; gap: 10px; flex-wrap: wrap;
+}
+.cal-view-toggle {
+  display: flex; gap: 2px; background: var(--carbon-800); border-radius: var(--r-md); padding: 2px;
+}
+.cal-view-btn {
+  background: none; border: none; color: var(--carbon-400); font-family: var(--font-body);
+  font-size: 0.65rem; padding: 7px 14px; border-radius: var(--r-sm); cursor: pointer;
+  text-transform: uppercase; letter-spacing: 0.06em; font-weight: 600; transition: all 0.15s;
+}
+.cal-view-btn.active { background: var(--teal-med); color: var(--teal); }
+.cal-nav { display: flex; align-items: center; gap: 10px; }
+.cal-nav-btn {
+  background: var(--carbon-800); border: 1px solid var(--carbon-700); color: var(--carbon-300);
+  width: 34px; height: 34px; border-radius: var(--r-sm); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; transition: all 0.15s;
+}
+.cal-nav-btn:hover { border-color: var(--teal); color: var(--teal); }
+.cal-date-label {
+  font-family: var(--font-display); font-size: 0.72rem; color: var(--carbon-100);
+  letter-spacing: 0.04em; min-width: 160px; text-align: center;
+}
+.cal-today-btn {
+  background: none; border: 1px solid var(--carbon-600); color: var(--carbon-400);
+  font-family: var(--font-body); font-size: 0.55rem; padding: 5px 10px;
+  border-radius: var(--r-sm); cursor: pointer; text-transform: uppercase;
+  letter-spacing: 0.05em; transition: all 0.15s;
+}
+.cal-today-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+/* Month Grid */
+.cal-month-grid {
+  display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px;
+  background: var(--carbon-800); border-radius: var(--r-md); overflow: hidden;
+}
+.cal-weekday-header {
+  background: var(--carbon-850); padding: 8px 4px; text-align: center;
+  font-family: var(--font-display); font-size: 0.5rem; color: var(--carbon-400);
+  letter-spacing: 0.08em; text-transform: uppercase;
+}
+.cal-day-cell {
+  background: var(--carbon-900); min-height: 90px; padding: 4px;
+  cursor: pointer; transition: background 0.15s; position: relative;
+}
+.cal-day-cell:hover { background: var(--carbon-850); }
+.cal-day-cell.other-month { opacity: 0.35; }
+.cal-day-cell.today { background: var(--teal-dim); }
+.cal-day-num { font-size: 0.6rem; color: var(--carbon-400); padding: 2px 4px; font-weight: 600; }
+.cal-day-cell.today .cal-day-num { color: var(--teal); font-weight: 700; }
+.cal-event-pill {
+  font-size: 0.48rem; padding: 2px 5px; border-radius: 2px;
+  margin: 1px 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  cursor: pointer; font-weight: 500; line-height: 1.4;
+}
+.cal-event-pill.type-deadline { background: var(--red-med); color: #ff6b6b; }
+.cal-event-pill.type-court_date { background: var(--purple-dim); color: #c084fc; }
+.cal-event-pill.type-exchange { background: var(--blue-dim); color: #60a5fa; }
+.cal-event-pill.type-task { background: var(--teal-dim); color: var(--teal); }
+.cal-event-pill.type-meeting { background: var(--silver-dim); color: var(--silver); }
+.cal-event-pill.type-flag { background: var(--rose-dim); color: var(--rose); }
+.cal-more-link { font-size: 0.45rem; color: var(--teal); padding: 1px 4px; cursor: pointer; }
+
+/* Week View */
+.cal-week-grid {
+  display: grid; grid-template-columns: 54px repeat(7, 1fr); gap: 1px;
+  background: var(--carbon-800); border-radius: var(--r-md); overflow: hidden;
+}
+.cal-week-header-cell {
+  background: var(--carbon-850); padding: 8px 4px; text-align: center;
+  font-family: var(--font-display); font-size: 0.48rem; color: var(--carbon-400);
+  letter-spacing: 0.06em;
+}
+.cal-week-header-cell.today-col { color: var(--teal); }
+.cal-week-header-date { display: block; font-size: 0.7rem; color: var(--carbon-200); margin-top: 2px; }
+.cal-week-header-cell.today-col .cal-week-header-date { color: var(--teal); }
+.cal-time-label {
+  background: var(--carbon-900); padding: 4px; text-align: right;
+  font-size: 0.45rem; color: var(--carbon-500); font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid var(--carbon-850);
+}
+.cal-week-slot {
+  background: var(--carbon-900); min-height: 44px; padding: 2px;
+  border-bottom: 1px solid var(--carbon-850); cursor: pointer;
+  transition: background 0.15s; position: relative;
+}
+.cal-week-slot:hover { background: var(--carbon-850); }
+.cal-week-slot.today-col { background: var(--teal-dim); }
+.cal-week-slot.today-col:hover { background: rgba(0,161,155,0.15); }
+
+/* Day View */
+.cal-day-grid { background: var(--carbon-800); border-radius: var(--r-md); overflow: hidden; }
+.cal-day-row {
+  display: grid; grid-template-columns: 54px 1fr; gap: 1px;
+  border-bottom: 1px solid var(--carbon-850);
+}
+.cal-day-time {
+  background: var(--carbon-900); padding: 8px 6px; text-align: right;
+  font-size: 0.5rem; color: var(--carbon-500); font-variant-numeric: tabular-nums;
+}
+.cal-day-slot {
+  background: var(--carbon-900); min-height: 52px; padding: 4px;
+  cursor: pointer; transition: background 0.15s;
+}
+.cal-day-slot:hover { background: var(--carbon-850); }
+.cal-day-event {
+  font-size: 0.55rem; padding: 4px 8px; border-radius: var(--r-sm);
+  margin: 2px 0; cursor: pointer; font-weight: 500; line-height: 1.5;
+}
+.cal-day-event .cal-ev-time { font-size: 0.48rem; opacity: 0.7; margin-right: 6px; }
+.cal-day-event.type-deadline { background: var(--red-med); color: #ff6b6b; }
+.cal-day-event.type-court_date { background: var(--purple-dim); color: #c084fc; }
+.cal-day-event.type-exchange { background: var(--blue-dim); color: #60a5fa; }
+.cal-day-event.type-task { background: var(--teal-dim); color: var(--teal); }
+.cal-day-event.type-meeting { background: var(--silver-dim); color: var(--silver); }
+.cal-day-event.type-flag { background: var(--rose-dim); color: var(--rose); }
+
+/* Template Buttons */
+.cal-templates { display: flex; gap: 6px; margin-top: 14px; flex-wrap: wrap; }
+.cal-template-btn {
+  background: var(--carbon-800); border: 1px dashed var(--carbon-600);
+  color: var(--carbon-400); font-family: var(--font-body); font-size: 0.52rem;
+  padding: 7px 12px; border-radius: var(--r-md); cursor: pointer;
+  transition: all 0.15s; display: flex; align-items: center; gap: 5px;
+}
+.cal-template-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
 </style>
 </head>
 <body>
@@ -1589,6 +1721,7 @@ input, select, textarea { font-family: inherit; }
       <button class="nav-item" data-view="capture"><span class="nav-icon">&#9655;</span> Paddock Intake</button>
       <button class="nav-item" data-view="legal"><span class="nav-icon">&#9878;</span> Legal Tracker</button>
       <button class="nav-item" data-view="financial"><span class="nav-icon">$</span> Financial Flags</button>
+      <button class="nav-item" data-view="calendar"><span class="nav-icon">&#128197;</span> Calendar</button>
     </div>
     <div class="sidebar-section">
       <div class="sidebar-section-label">Race Engineering</div>
@@ -1816,6 +1949,31 @@ input, select, textarea { font-family: inherit; }
       <div class="intel-results" id="intel-results"></div>
     </div>
 
+    <!-- CALENDAR -->
+    <div class="view-container" id="view-calendar">
+      <div class="cal-controls">
+        <div class="cal-view-toggle">
+          <button class="cal-view-btn active" data-calview="month" onclick="setCalView('month')">Month</button>
+          <button class="cal-view-btn" data-calview="week" onclick="setCalView('week')">Week</button>
+          <button class="cal-view-btn" data-calview="day" onclick="setCalView('day')">Day</button>
+        </div>
+        <div class="cal-nav">
+          <button class="cal-nav-btn" onclick="calNav(-1)">&#9664;</button>
+          <span class="cal-date-label" id="cal-date-label">March 2026</span>
+          <button class="cal-nav-btn" onclick="calNav(1)">&#9654;</button>
+          <button class="cal-today-btn" onclick="calToday()">Today</button>
+        </div>
+        <button class="view-add-btn" onclick="openSheet('sheet-new-cal-event')">+ New Event</button>
+      </div>
+      <div id="cal-grid"></div>
+      <div class="cal-templates">
+        <button class="cal-template-btn" onclick="calTemplate('weekly-pickup')">&#128337; Weekly Pickup</button>
+        <button class="cal-template-btn" onclick="calTemplate('biweekly-exchange')">&#128257; Biweekly Exchange</button>
+        <button class="cal-template-btn" onclick="calTemplate('monthly-invoice')">&#128176; Monthly Invoice Due</button>
+        <button class="cal-template-btn" onclick="calTemplate('court-checkin')">&#9878; Court Check-in</button>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -1927,6 +2085,26 @@ input, select, textarea { font-family: inherit; }
   </div>
 </div>
 
+<!-- New Calendar Event Sheet -->
+<div class="bottom-sheet" id="sheet-new-cal-event">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">New Calendar Event</span><button class="sheet-close" onclick="closeSheet('sheet-new-cal-event')">&times;</button></div>
+  <div class="sheet-body">
+    <div class="sheet-field"><label class="sheet-label">Title</label><input class="sheet-input" id="sce-title" placeholder="Event name"></div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Date</label><input type="date" class="sheet-input" id="sce-date"></div>
+      <div class="sheet-field"><label class="sheet-label">Time</label><input type="time" class="sheet-input" id="sce-time"></div>
+    </div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Type</label><select class="sheet-select" id="sce-type"><option value="task">Task</option><option value="deadline">Deadline</option><option value="court_date">Court Date</option><option value="exchange">Exchange</option><option value="meeting">Meeting</option><option value="flag">Flag</option></select></div>
+      <div class="sheet-field"><label class="sheet-label">Domain</label><select class="sheet-select" id="sce-domain"><option value="general" selected>General</option><option value="legal">Legal</option><option value="financial">Financial</option><option value="operations">Operations</option><option value="hr">HR</option><option value="personal">Personal</option></select></div>
+    </div>
+    <div class="sheet-field"><label class="sheet-label">Description</label><textarea class="sheet-textarea" id="sce-desc" placeholder="Optional details"></textarea></div>
+    <div class="sheet-field"><label class="sheet-label">Repeat</label><select class="sheet-select" id="sce-repeat"><option value="">No Repeat</option><option value="weekly">Weekly</option><option value="biweekly">Biweekly</option><option value="monthly">Monthly</option></select></div>
+    <button class="sheet-submit" onclick="submitCalEvent()">Create Event</button>
+  </div>
+</div>
+
 <div class="toasts" id="toasts"></div>
 
 <script>
@@ -1944,7 +2122,7 @@ const MARTA_CONFIG = {
 // STATE
 // ================================================================
 let sb = null, user = null, isDemo = false, currentView = 'dashboard';
-const demo = { entries: [], deadlines: [], matters: [], comms: [], flags: [], insights: [], tasks: [], employees: [], onboarding: [], activityLog: [] };
+const demo = { entries: [], deadlines: [], matters: [], comms: [], flags: [], insights: [], tasks: [], employees: [], onboarding: [], activityLog: [], calendarEvents: [] };
 
 // ================================================================
 // BOOT
@@ -2027,7 +2205,7 @@ function enterApp() {
 // ================================================================
 // VIEW ROUTER
 // ================================================================
-var viewTitles = { dashboard: ['Dashboard','pit wall overview'], capture: ['Paddock Intake','team radio'], legal: ['Legal Tracker','cases \u00b7 deadlines \u00b7 comms'], financial: ['Financial Flags','audit \u00b7 disputes \u00b7 claims'], intel: ['Intelligence Console','analyze \u00b7 draft \u00b7 defend'], tasks: ['Tasks','manage \u00b7 track \u00b7 complete'], crew: ['Crew','team roster \u00b7 onboarding'], activity: ['Activity Feed','system log'] };
+var viewTitles = { dashboard: ['Dashboard','pit wall overview'], capture: ['Paddock Intake','team radio'], legal: ['Legal Tracker','cases \u00b7 deadlines \u00b7 comms'], financial: ['Financial Flags','audit \u00b7 disputes \u00b7 claims'], calendar: ['Calendar','month \u00b7 week \u00b7 day'], intel: ['Intelligence Console','analyze \u00b7 draft \u00b7 defend'], tasks: ['Tasks','manage \u00b7 track \u00b7 complete'], crew: ['Crew','team roster \u00b7 onboarding'], activity: ['Activity Feed','system log'] };
 
 document.querySelectorAll('.nav-item[data-view]').forEach(function(btn) {
   btn.addEventListener('click', function() { switchView(btn.dataset.view); });
@@ -2048,6 +2226,7 @@ function switchView(view) {
   if (view === 'capture') { loadRecentEntries(); if (intakeMode === 'radio') setTimeout(function(){ var ci = document.getElementById('capture-input'); if(ci) ci.focus(); }, 100); }
   if (view === 'legal') loadLegalData();
   if (view === 'financial') loadFinancialData();
+  if (view === 'calendar') loadCalendar();
   if (view === 'tasks') loadTasks();
   if (view === 'crew') loadCrew();
   if (view === 'activity') loadActivityFeed();
@@ -3030,6 +3209,240 @@ function copyDraft(el) {
 }
 
 // ================================================================
+// CALENDAR VIEW
+// ================================================================
+var calView = 'month';
+var calDate = new Date();
+
+function setCalView(v) {
+  calView = v;
+  document.querySelectorAll('.cal-view-btn').forEach(function(b) { b.classList.toggle('active', b.dataset.calview === v); });
+  renderCalendar();
+}
+
+function calNav(dir) {
+  if (calView === 'month') calDate.setMonth(calDate.getMonth() + dir);
+  else if (calView === 'week') calDate.setDate(calDate.getDate() + dir * 7);
+  else calDate.setDate(calDate.getDate() + dir);
+  renderCalendar();
+}
+
+function calToday() {
+  calDate = new Date();
+  renderCalendar();
+}
+
+async function loadCalendar() {
+  if (isDemo) { renderCalendar(); return; }
+  try {
+    var r = await sb.from('calendar_events').select('*').order('event_date', { ascending: true });
+    demo.calendarEvents = r.data || [];
+    var ld = await sb.from('legal_deadlines').select('*, legal_matters(case_name)').order('deadline_date', { ascending: true });
+    demo.legalDeadlinesForCal = ld.data || [];
+    renderCalendar();
+  } catch (e) { console.error('Calendar:', e); renderCalendar(); }
+}
+
+function getCalEvents() {
+  var events = [];
+  var src = demo.calendarEvents || [];
+  src.forEach(function(e) {
+    events.push({ id: e.id, title: e.title, date: e.event_date, time: e.event_time || null, type: e.event_type || 'task', domain: e.domain || 'general', description: e.description || '', source: e.source || 'manual', repeat_rule: e.repeat_rule || null, _src: 'calendar' });
+  });
+  var deadlines = isDemo ? (demo.deadlines || []) : (demo.legalDeadlinesForCal || []);
+  deadlines.forEach(function(d) {
+    var dt = d.deadline_date ? d.deadline_date.split('T')[0] : null;
+    if (!dt) return;
+    events.push({ id: 'ld-' + d.id, title: d.title, date: dt, time: null, type: 'deadline', domain: 'legal', description: d.legal_matters ? d.legal_matters.case_name : '', source: 'legal_deadline', _src: 'deadline' });
+  });
+  return events;
+}
+
+function renderCalendar() {
+  var label = document.getElementById('cal-date-label');
+  var grid = document.getElementById('cal-grid');
+  if (!label || !grid) return;
+  if (calView === 'month') {
+    label.textContent = calDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+    renderCalMonth(grid);
+  } else if (calView === 'week') {
+    var ws = new Date(calDate); ws.setDate(ws.getDate() - ws.getDay());
+    var we = new Date(ws); we.setDate(we.getDate() + 6);
+    label.textContent = ws.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' \u2014 ' + we.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    renderCalWeek(grid);
+  } else {
+    label.textContent = calDate.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' });
+    renderCalDay(grid);
+  }
+}
+
+function fmtDateStr(d) {
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function renderCalMonth(grid) {
+  var year = calDate.getFullYear(), month = calDate.getMonth();
+  var first = new Date(year, month, 1);
+  var startDay = first.getDay();
+  var daysInMonth = new Date(year, month + 1, 0).getDate();
+  var events = getCalEvents();
+  var todayStr = fmtDateStr(new Date());
+  var html = '<div class="cal-month-grid">';
+  ['SUN','MON','TUE','WED','THU','FRI','SAT'].forEach(function(d) { html += '<div class="cal-weekday-header">' + d + '</div>'; });
+  var prevDays = new Date(year, month, 0).getDate();
+  for (var i = startDay - 1; i >= 0; i--) {
+    var pd = prevDays - i;
+    var pdStr = fmtDateStr(new Date(year, month - 1, pd));
+    html += '<div class="cal-day-cell other-month" onclick="calDayClick(\'' + pdStr + '\')"><div class="cal-day-num">' + pd + '</div></div>';
+  }
+  for (var d = 1; d <= daysInMonth; d++) {
+    var dateStr = fmtDateStr(new Date(year, month, d));
+    var isToday = dateStr === todayStr;
+    var dayEvents = events.filter(function(e) { return e.date === dateStr; });
+    html += '<div class="cal-day-cell' + (isToday ? ' today' : '') + '" onclick="calDayClick(\'' + dateStr + '\')">';
+    html += '<div class="cal-day-num">' + d + '</div>';
+    dayEvents.slice(0, 3).forEach(function(ev) {
+      html += '<div class="cal-event-pill type-' + ev.type + '" onclick="event.stopPropagation();calEventClick(\'' + ev.id + '\')" title="' + esc(ev.title) + '">' + esc(ev.title) + '</div>';
+    });
+    if (dayEvents.length > 3) html += '<div class="cal-more-link" onclick="event.stopPropagation();calDayClick(\'' + dateStr + '\')">+' + (dayEvents.length - 3) + ' more</div>';
+    html += '</div>';
+  }
+  var totalCells = startDay + daysInMonth;
+  var remaining = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+  for (var n = 1; n <= remaining; n++) {
+    var ndStr = fmtDateStr(new Date(year, month + 1, n));
+    html += '<div class="cal-day-cell other-month" onclick="calDayClick(\'' + ndStr + '\')"><div class="cal-day-num">' + n + '</div></div>';
+  }
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function renderCalWeek(grid) {
+  var ws = new Date(calDate); ws.setDate(ws.getDate() - ws.getDay());
+  var events = getCalEvents();
+  var todayStr = fmtDateStr(new Date());
+  var dayNames = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  var html = '<div class="cal-week-grid">';
+  html += '<div class="cal-week-header-cell"></div>';
+  for (var i = 0; i < 7; i++) {
+    var dd = new Date(ws); dd.setDate(dd.getDate() + i);
+    var ds = fmtDateStr(dd);
+    html += '<div class="cal-week-header-cell' + (ds === todayStr ? ' today-col' : '') + '">' + dayNames[i] + '<span class="cal-week-header-date">' + dd.getDate() + '</span></div>';
+  }
+  for (var h = 7; h <= 21; h++) {
+    var timeStr = (h <= 12 ? h : h - 12) + (h < 12 ? 'AM' : 'PM');
+    html += '<div class="cal-time-label">' + timeStr + '</div>';
+    for (var d = 0; d < 7; d++) {
+      var dd2 = new Date(ws); dd2.setDate(dd2.getDate() + d);
+      var ds2 = fmtDateStr(dd2);
+      var hourEvents = events.filter(function(e) {
+        if (e.date !== ds2) return false;
+        if (!e.time) return h === 7;
+        return parseInt(e.time.split(':')[0]) === h;
+      });
+      html += '<div class="cal-week-slot' + (ds2 === todayStr ? ' today-col' : '') + '" onclick="calSlotClick(\'' + ds2 + '\',' + h + ')">';
+      hourEvents.forEach(function(ev) {
+        html += '<div class="cal-event-pill type-' + ev.type + '" onclick="event.stopPropagation();calEventClick(\'' + ev.id + '\')" title="' + esc(ev.title) + '">' + esc(ev.title) + '</div>';
+      });
+      html += '</div>';
+    }
+  }
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function renderCalDay(grid) {
+  var events = getCalEvents();
+  var ds = fmtDateStr(calDate);
+  var dayEvents = events.filter(function(e) { return e.date === ds; });
+  var html = '<div class="cal-day-grid">';
+  for (var h = 6; h <= 22; h++) {
+    var timeStr = (h === 0 ? 12 : h <= 12 ? h : h - 12) + ':00 ' + (h < 12 ? 'AM' : 'PM');
+    var hourEvents = dayEvents.filter(function(e) {
+      if (!e.time) return h === 6;
+      return parseInt(e.time.split(':')[0]) === h;
+    });
+    html += '<div class="cal-day-row"><div class="cal-day-time">' + timeStr + '</div><div class="cal-day-slot" onclick="calSlotClick(\'' + ds + '\',' + h + ')">';
+    hourEvents.forEach(function(ev) {
+      var t = ev.time ? ev.time.substring(0, 5) : '';
+      html += '<div class="cal-day-event type-' + ev.type + '" onclick="event.stopPropagation();calEventClick(\'' + ev.id + '\')">';
+      if (t) html += '<span class="cal-ev-time">' + t + '</span>';
+      html += esc(ev.title) + '</div>';
+    });
+    html += '</div></div>';
+  }
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function calDayClick(dateStr) {
+  calDate = new Date(dateStr + 'T12:00:00');
+  setCalView('day');
+}
+
+function calSlotClick(dateStr, hour) {
+  document.getElementById('sce-date').value = dateStr;
+  document.getElementById('sce-time').value = String(hour).padStart(2, '0') + ':00';
+  openSheet('sheet-new-cal-event');
+}
+
+function calEventClick(id) {
+  if (id.startsWith('ld-')) { toast('Legal deadline \u2014 view in Legal Tracker', 'info'); return; }
+  var events = demo.calendarEvents || [];
+  var ev = events.find(function(e) { return e.id === id; });
+  if (!ev) return;
+  if (confirm('Delete "' + ev.title + '"?')) deleteCalEvent(id);
+}
+
+async function submitCalEvent() {
+  var title = document.getElementById('sce-title').value.trim();
+  var date = document.getElementById('sce-date').value;
+  var time = document.getElementById('sce-time').value || null;
+  var type = document.getElementById('sce-type').value;
+  var domain = document.getElementById('sce-domain').value;
+  var desc = document.getElementById('sce-desc').value.trim();
+  var repeat = document.getElementById('sce-repeat').value || null;
+  if (!title || !date) { toast('Title and date required', 'error'); return; }
+  var ev = { id: crypto.randomUUID(), title: title, event_date: date, event_time: time, event_type: type, domain: domain, description: desc, source: 'manual', repeat_rule: repeat, created_at: new Date().toISOString() };
+  if (isDemo) {
+    demo.calendarEvents.push(ev);
+  } else {
+    try { ev.user_id = user.id; await sb.from('calendar_events').insert(ev); } catch (e) { toast('Error saving event', 'error'); console.error(e); return; }
+  }
+  closeSheet('sheet-new-cal-event');
+  document.getElementById('sce-title').value = '';
+  document.getElementById('sce-desc').value = '';
+  document.getElementById('sce-repeat').value = '';
+  toast('Event created', 'success');
+  renderCalendar();
+}
+
+async function deleteCalEvent(id) {
+  if (isDemo) {
+    demo.calendarEvents = (demo.calendarEvents || []).filter(function(e) { return e.id !== id; });
+  } else {
+    try { await sb.from('calendar_events').delete().eq('id', id); } catch (e) { toast('Error deleting', 'error'); return; }
+  }
+  toast('Event deleted', 'success');
+  renderCalendar();
+}
+
+function calTemplate(type) {
+  var d = document.getElementById('sce-date');
+  var t = document.getElementById('sce-time');
+  var title = document.getElementById('sce-title');
+  var et = document.getElementById('sce-type');
+  var dom = document.getElementById('sce-domain');
+  var rep = document.getElementById('sce-repeat');
+  d.value = fmtDateStr(new Date());
+  if (type === 'weekly-pickup') { title.value = 'Kaleesi Pickup'; et.value = 'exchange'; dom.value = 'personal'; t.value = '17:30'; rep.value = 'weekly'; }
+  else if (type === 'biweekly-exchange') { title.value = 'Custody Exchange'; et.value = 'exchange'; dom.value = 'personal'; t.value = '18:00'; rep.value = 'biweekly'; }
+  else if (type === 'monthly-invoice') { title.value = 'Monthly Invoice Due'; et.value = 'deadline'; dom.value = 'financial'; t.value = ''; rep.value = 'monthly'; }
+  else if (type === 'court-checkin') { title.value = 'Court Status Check-in'; et.value = 'court_date'; dom.value = 'legal'; t.value = '09:00'; rep.value = 'monthly'; }
+  openSheet('sheet-new-cal-event');
+}
+
+// ================================================================
 // BOTTOM SHEET CONTROLLER
 // ================================================================
 function openSheet(id) {
@@ -3447,6 +3860,7 @@ function subscribeRealtime() {
     .on('postgres_changes',{event:'*',schema:'public',table:'activity_log'},function(){if(currentView==='activity')loadActivityFeed();})
     .on('postgres_changes',{event:'*',schema:'public',table:'legal_matters'},function(){if(currentView==='legal')loadLegalData();})
     .on('postgres_changes',{event:'*',schema:'public',table:'legal_communications'},function(){if(currentView==='legal')loadLegalData();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'calendar_events'},function(){if(currentView==='calendar')loadCalendar();})
     .subscribe();
 }
 
@@ -3537,6 +3951,16 @@ function seedDemoData() {
     {id:crypto.randomUUID(),action:'INSERT',table_name:'legal_deadlines',record_id:demo.deadlines[0].id,created_at:new Date(now-H*24).toISOString()},
     {id:crypto.randomUUID(),action:'INSERT',table_name:'entries',record_id:demo.entries[6].id,created_at:new Date(now-H*18).toISOString()},
     {id:crypto.randomUUID(),action:'DELETE',table_name:'tasks',record_id:crypto.randomUUID(),created_at:new Date(now-H*30).toISOString()},
+  ];
+
+  // Calendar events
+  demo.calendarEvents = [
+    {id:crypto.randomUUID(),title:'Kaleesi Pickup \u2014 Primrose',event_date:new Date(now+H*24).toISOString().split('T')[0],event_time:'17:30',event_type:'exchange',domain:'personal',description:'Friday pickup from Primrose school',source:'manual',repeat_rule:'weekly',created_at:new Date(now-H*48).toISOString()},
+    {id:crypto.randomUUID(),title:'Alpha Baking Rate Review',event_date:new Date(now+H*48).toISOString().split('T')[0],event_time:'14:00',event_type:'meeting',domain:'operations',description:'Prep rate comparison and 90-day volume',source:'manual',repeat_rule:null,created_at:new Date(now-H*24).toISOString()},
+    {id:crypto.randomUUID(),title:'Court Status Conference',event_date:new Date(now+H*120).toISOString().split('T')[0],event_time:'09:30',event_type:'court_date',domain:'legal',description:'Konopko v. Cichowicz \u2014 DuPage County',source:'manual',repeat_rule:null,created_at:new Date(now-H*72).toISOString()},
+    {id:crypto.randomUUID(),title:'Custody Exchange',event_date:new Date(now+H*72).toISOString().split('T')[0],event_time:'18:00',event_type:'exchange',domain:'personal',description:'Biweekly exchange',source:'manual',repeat_rule:'biweekly',created_at:new Date(now-H*100).toISOString()},
+    {id:crypto.randomUUID(),title:'QuickBooks Reconciliation',event_date:new Date(now+H*168).toISOString().split('T')[0],event_time:null,event_type:'task',domain:'financial',description:'Monthly close process',source:'manual',repeat_rule:'monthly',created_at:new Date(now-H*200).toISOString()},
+    {id:crypto.randomUUID(),title:'Bond Hearing \u2014 Zurich',event_date:new Date(now+H*240).toISOString().split('T')[0],event_time:'10:00',event_type:'court_date',domain:'legal',description:'MC# 971343 bond claim review',source:'manual',repeat_rule:null,created_at:new Date(now-H*50).toISOString()},
   ];
 }
 
