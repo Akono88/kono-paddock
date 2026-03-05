@@ -1688,6 +1688,31 @@ input, select, textarea { font-family: inherit; }
   transition: all 0.15s; display: flex; align-items: center; gap: 5px;
 }
 .cal-template-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
+
+/* Suggestion Pills */
+.suggest-pill {
+  display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px;
+  border: 1px solid var(--teal-med); border-radius: 12px; background: none;
+  color: var(--teal); font-family: var(--font-display); font-size: 0.52rem;
+  cursor: pointer; transition: all 0.15s; white-space: nowrap;
+}
+.suggest-pill:hover { background: var(--teal-dim); }
+
+/* Intel History Cards */
+.intel-history-card {
+  background: var(--carbon-800); border: 1px solid var(--carbon-700); border-radius: var(--r-md);
+  padding: 12px 14px; margin-bottom: 8px; cursor: pointer; transition: all 0.15s;
+}
+.intel-history-card:hover { border-color: var(--teal); }
+.intel-history-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.intel-history-mode {
+  font-family: var(--font-display); font-size: 0.48rem; text-transform: uppercase;
+  letter-spacing: 0.06em; padding: 2px 8px; border-radius: var(--r-sm);
+  background: var(--teal-dim); color: var(--teal); font-weight: 600;
+}
+.intel-history-date { font-size: 0.52rem; color: var(--carbon-500); }
+.intel-history-preview { font-size: 0.6rem; color: var(--carbon-300); line-height: 1.5; }
+.intel-history-actions { display: flex; gap: 6px; margin-top: 8px; }
 </style>
 </head>
 <body>
@@ -1920,6 +1945,7 @@ input, select, textarea { font-family: inherit; }
           <button class="intel-mode-btn" data-intel="doc_analysis" onclick="setIntelMode('doc_analysis')"><span class="im-icon">&#128196;</span><span class="im-label">Doc Analysis</span></button>
           <button class="intel-mode-btn" data-intel="behavioral" onclick="setIntelMode('behavioral')"><span class="im-icon">&#9881;</span><span class="im-label">Behavioral</span></button>
           <button class="intel-mode-btn" data-intel="strategy" onclick="setIntelMode('strategy')"><span class="im-icon">&#9733;</span><span class="im-label">Strategy</span></button>
+          <button class="intel-mode-btn" data-intel="history" onclick="setIntelMode('history')"><span class="im-icon">&#129504;</span><span class="im-label">History</span></button>
         </div>
         <div class="intel-body">
           <div class="intel-input-area">
@@ -1937,10 +1963,6 @@ input, select, textarea { font-family: inherit; }
           <div class="intel-submit-row">
             <select class="override-select" id="intel-context-select">
               <option value="">No case context</option>
-              <option value="Konopko v. Cichowicz — 2025FA000577">Custody — 2025FA000577</option>
-              <option value="US Cargo Brokers — Bond Claims MC# 971343">Bond Claims — MC# 971343</option>
-              <option value="US Cargo Brokers — Operations">Operations</option>
-              <option value="Elite Studio — Brand/IP">Elite Studio</option>
             </select>
             <button class="intel-run-btn" id="intel-run-btn" onclick="runIntelAnalysis()"><span class="run-spinner" id="intel-spinner"></span>RUN ANALYSIS</button>
           </div>
@@ -2227,6 +2249,7 @@ function switchView(view) {
   if (view === 'legal') loadLegalData();
   if (view === 'financial') loadFinancialData();
   if (view === 'calendar') loadCalendar();
+  if (view === 'intel') loadIntelCaseContext();
   if (view === 'tasks') loadTasks();
   if (view === 'crew') loadCrew();
   if (view === 'activity') loadActivityFeed();
@@ -2515,6 +2538,13 @@ function renderParsePreview() {
   if (parsed.flagType) h += '<span class="parse-label" style="margin-left:12px">Flag:</span><span class="parse-chip flag-type">'+parsed.flagType.replace(/_/g,' ')+'</span>';
   if (parsed.amount) h += '<span class="parse-label" style="margin-left:12px">Amount:</span><span class="parse-amount">'+parsed.amount+'</span>';
   if (parsed.tags.length) { h += '<span class="parse-label" style="margin-left:12px">Tags:</span>'; parsed.tags.forEach(function(t){ h += '<span class="parse-chip domain-general">#'+t+'</span>'; }); }
+  // Suggestion pills
+  var pills = '';
+  var dateMatch = /\b(tomorrow|friday|monday|tuesday|wednesday|thursday|saturday|sunday|eow|eod|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|\d{1,2}\/\d{1,2})\b/i.test(text);
+  if (dateMatch) pills += '<button class="suggest-pill" onclick="suggestDeadlineFromCapture()">&#128197; Also create a deadline?</button>';
+  if (parsed.amount && parsed.domain === 'financial') pills += '<button class="suggest-pill" onclick="suggestFlagFromCapture()">&#128176; Create financial flag?</button>';
+  if (text.length > 500) pills += '<button class="suggest-pill" onclick="suggestEmailDefense()">&#129504; Analyze in Email Defense?</button>';
+  if (pills) h += '<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap">' + pills + '</div>';
   content.innerHTML = h;
   box.classList.add('visible');
 }
@@ -2730,14 +2760,31 @@ function renderDashDeadlines(deadlines) {
 // Recent entries
 async function loadRecentEntries() {
   var el = document.getElementById('capture-log-list');
-  if (isDemo) { el.innerHTML = demo.entries.length ? demo.entries.slice(0,25).map(function(e){return entryRowHTML(e,true);}).join('') : '<div class="panel-empty"><div class="empty-icon">&#9655;</div><p>Transmissions appear here.</p></div>'; return; }
-  try { var r = await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(25); el.innerHTML = (r.data||[]).length ? r.data.map(function(e){return entryRowHTML(e,true);}).join('') : '<div class="panel-empty"><p>No entries yet.</p></div>'; }
-  catch(e){ el.innerHTML = '<div class="panel-empty"><p>Error loading.</p></div>'; }
+  if (isDemo) {
+    _linkedTaskMap = {};
+    demo.tasks.forEach(function(t) { if (t.linked_entry_id) _linkedTaskMap[t.linked_entry_id] = (_linkedTaskMap[t.linked_entry_id] || 0) + 1; });
+    el.innerHTML = demo.entries.length ? demo.entries.slice(0,25).map(function(e){return entryRowHTML(e,true);}).join('') : '<div class="panel-empty"><div class="empty-icon">&#9655;</div><p>Transmissions appear here.</p></div>'; return;
+  }
+  try {
+    var r = await sb.from('entries').select('*').order('created_at',{ascending:false}).limit(25);
+    var entries = r.data || [];
+    _linkedTaskMap = {};
+    if (entries.length) {
+      var ids = entries.map(function(e){return e.id;});
+      var tr = await sb.from('tasks').select('linked_entry_id').in_('linked_entry_id', ids);
+      (tr.data||[]).forEach(function(t) { if (t.linked_entry_id) _linkedTaskMap[t.linked_entry_id] = (_linkedTaskMap[t.linked_entry_id] || 0) + 1; });
+    }
+    el.innerHTML = entries.length ? entries.map(function(e){return entryRowHTML(e,true);}).join('') : '<div class="panel-empty"><p>No entries yet.</p></div>';
+  } catch(e){ el.innerHTML = '<div class="panel-empty"><p>Error loading.</p></div>'; }
 }
 
+var _linkedTaskMap = {};
 function entryRowHTML(e, resolve) {
   var files = renderFileChips(e.metadata);
-  return '<div class="entry-row '+(e.resolved?'resolved':'')+'" '+(resolve?'onclick="toggleResolve(\''+e.id+'\')"':'')+'><span class="domain-dot '+e.domain+'"></span><div class="entry-body"><div class="entry-meta-line"><span class="entry-domain-tag">'+e.domain+'</span><span class="priority-pip '+e.priority+'">'+e.priority+'</span><span class="entry-time-tag">'+timeAgo(e.created_at)+'</span></div><div class="entry-text">'+esc(e.content)+'</div>'+files+'</div></div>';
+  var linkChip = '';
+  var linkCount = _linkedTaskMap[e.id] || 0;
+  if (linkCount > 0) linkChip = '<span class="parse-chip domain-general" style="cursor:pointer;margin-top:4px;font-size:0.5rem" onclick="event.stopPropagation();switchView(\'tasks\')">&#128203; ' + linkCount + ' task' + (linkCount > 1 ? 's' : '') + ' linked</span>';
+  return '<div class="entry-row '+(e.resolved?'resolved':'')+'" '+(resolve?'onclick="toggleResolve(\''+e.id+'\')"':'')+'><span class="domain-dot '+e.domain+'"></span><div class="entry-body"><div class="entry-meta-line"><span class="entry-domain-tag">'+e.domain+'</span><span class="priority-pip '+e.priority+'">'+e.priority+'</span><span class="entry-time-tag">'+timeAgo(e.created_at)+'</span></div><div class="entry-text">'+esc(e.content)+'</div>'+files+linkChip+'</div></div>';
 }
 
 async function toggleResolve(id) {
@@ -2891,6 +2938,8 @@ function renderInsightCards(insights, isPast) {
     h += '<div class="insight-actions">';
     h += '<button class="insight-btn copy-btn" onclick="event.stopPropagation();copyInsight(\'' + i.id + '\')" title="Copy to clipboard">\ud83d\udccb Copy</button>';
     if (!isPast) h += '<button class="insight-btn ack-btn" onclick="event.stopPropagation();ackInsight(\'' + i.id + '\')" title="Acknowledge &amp; archive">\u2713 Ack</button>';
+    var actionWords = /\b(review|call|file|respond|prepare|submit|send|schedule|contact|follow up|escalate|document)\b/i;
+    if (actionWords.test(i.content || '')) h += '<button class="insight-btn" style="background:var(--teal-dim);color:var(--teal);border-color:var(--teal-med)" onclick="event.stopPropagation();actOnInsight(\'' + i.id + '\')">\u25b6\ufe0f Act on This</button>';
     h += '</div></div></div>';
     return h;
   }).join('');
@@ -2967,19 +3016,20 @@ function setIntelMode(mode) {
   document.querySelectorAll('.intel-mode-btn').forEach(function(b) { b.classList.remove('active'); });
   var btn = document.querySelector('.intel-mode-btn[data-intel="'+mode+'"]');
   if (btn) btn.classList.add('active');
-  // Show/hide party inputs for behavioral mode
+  var isHistory = mode === 'history';
   document.getElementById('intel-parties').style.display = mode === 'behavioral' ? 'flex' : 'none';
-  // Update placeholder
+  document.querySelector('.intel-input-area').style.display = isHistory ? 'none' : '';
+  document.querySelector('.intel-options').style.display = isHistory ? 'none' : '';
+  document.querySelector('.intel-submit-row').style.display = isHistory ? 'none' : '';
   var placeholders = {
-    ofw_draft: 'Type your raw message to Marta. Be honest — say what you actually want to say. The system will make it court-safe.',
+    ofw_draft: 'Type your raw message to Marta. Be honest \u2014 say what you actually want to say. The system will make it court-safe.',
     email_defense: 'Paste the email you received. The system will deconstruct intent, assess risk, and draft your response.',
     doc_analysis: 'Upload a PDF/image above, or paste text from a document. The system will extract dates, amounts, names, and significance.',
     behavioral: 'Paste the conversation between you and the other party. The system will analyze both sides with equal rigor.',
     strategy: 'Describe the business problem or workflow bottleneck. Be specific about what\'s not working.'
   };
   document.getElementById('intel-input').placeholder = placeholders[mode] || '';
-  // Clear results
-  document.getElementById('intel-results').classList.remove('visible');
+  if (isHistory) { loadIntelHistory(); } else { document.getElementById('intel-results').classList.remove('visible'); }
 }
 
 document.getElementById('intel-file-input').addEventListener('change', function(e) {
@@ -3034,6 +3084,10 @@ async function runIntelAnalysis() {
     if (data.error) throw new Error(data.error);
     renderIntelResults(intelMode, data.analysis);
     toast('Analysis complete', 'success');
+    // Auto-save to ai_insights
+    var saveObj = { id: crypto.randomUUID(), insight_type: intelMode, title: intelMode.replace(/_/g,' ') + ' analysis', content: JSON.stringify(data.analysis), severity: 'medium', acknowledged: false, metadata: { source: 'intelligence-console', mode: intelMode, timestamp: new Date().toISOString() }, created_at: new Date().toISOString() };
+    if (isDemo) { demo.insights.push(saveObj); }
+    else { try { saveObj.user_id = user.id; await sb.from('ai_insights').insert(saveObj); } catch(se) { console.error('Auto-save intel:', se); } }
   } catch(e) {
     toast('Intelligence error: ' + e.message, 'error');
   } finally {
@@ -3061,7 +3115,7 @@ function renderIntelResults(mode, a) {
     h += '<div class="intel-result-text highlight">' + esc(a.subject_line || '') + '</div></div>';
 
     h += '<div class="intel-result-card"><div class="intel-result-label">Court-Safe Draft</div>';
-    h += '<div class="intel-draft-box" onclick="copyDraft(this)" title="Click to copy">' + esc(a.rewritten_message || '') + '</div>';
+    h += '<div class="intel-draft-box" onclick="copyOFWDraft(this,'+JSON.stringify(JSON.stringify({subject_line:a.subject_line||'',rewritten_message:a.rewritten_message||''}))+')" title="Click to copy">' + esc(a.rewritten_message || '') + '</div>';
     h += '<div class="intel-copy-hint">Click to copy to clipboard</div></div>';
 
     if (a.coaching_note) {
@@ -3094,6 +3148,9 @@ function renderIntelResults(mode, a) {
       h += '<div class="intel-result-card"><div class="intel-result-label">Strategic Note</div>';
       h += '<div class="intel-result-text coaching">' + esc(a.strategic_note) + '</div></div>';
     }
+    if ((a.risk_level || 0) >= 4) {
+      h += '<div class="intel-result-card" style="border:1px solid var(--red-med)"><button class="sheet-submit" style="background:var(--red);font-size:0.6rem;padding:8px 16px" onclick="emailDefenseAutoFlag('+JSON.stringify(JSON.stringify({actual_intent:a.actual_intent||'',risk_explanation:a.risk_explanation||''}))+')">\ud83d\udea8 Create Critical Flag</button></div>';
+    }
 
   } else if (mode === 'doc_analysis') {
     h += '<div class="intel-result-card"><div class="intel-result-label">Document Type</div>';
@@ -3104,12 +3161,12 @@ function renderIntelResults(mode, a) {
 
     if (a.dates_found && a.dates_found.length) {
       h += '<div class="intel-result-card"><div class="intel-result-label">Dates Found</div>';
-      a.dates_found.forEach(function(d) { h += '<div class="intel-result-text"><span class="highlight">' + esc(d.date) + '</span> — ' + esc(d.context) + '</div>'; });
+      a.dates_found.forEach(function(d, idx) { h += '<div class="intel-result-text" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span><span class="highlight">' + esc(d.date) + '</span> \u2014 ' + esc(d.context) + '</span><button class="suggest-pill" onclick="docAnalysisCreateDeadline('+JSON.stringify(JSON.stringify(d))+')">&#128197; Create Deadline</button></div>'; });
       h += '</div>';
     }
     if (a.amounts_found && a.amounts_found.length) {
       h += '<div class="intel-result-card"><div class="intel-result-label">Amounts Found</div>';
-      a.amounts_found.forEach(function(d) { h += '<div class="intel-result-text"><span style="color:var(--green);font-weight:700">' + esc(d.amount) + '</span> — ' + esc(d.context) + '</div>'; });
+      a.amounts_found.forEach(function(d, idx) { h += '<div class="intel-result-text" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span><span style="color:var(--green);font-weight:700">' + esc(d.amount) + '</span> \u2014 ' + esc(d.context) + '</span><button class="suggest-pill" onclick="docAnalysisCreateFlag('+JSON.stringify(JSON.stringify(d))+')">&#128176; Create Financial Flag</button></div>'; });
       h += '</div>';
     }
     if (a.contradictions && a.contradictions.length) {
@@ -3199,13 +3256,198 @@ function copyDraft(el) {
   navigator.clipboard.writeText(el.textContent).then(function() {
     toast('Copied to clipboard', 'success');
   }).catch(function() {
-    // Fallback
     var range = document.createRange(); range.selectNodeContents(el);
     var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
     document.execCommand('copy');
     sel.removeAllRanges();
     toast('Copied to clipboard', 'success');
   });
+}
+
+// OFW Draft — auto-log on copy
+function copyOFWDraft(el, jsonStr) {
+  var text = el.textContent;
+  navigator.clipboard.writeText(text).then(function() {
+    if (!isDemo && sb && user) {
+      try {
+        var d = JSON.parse(jsonStr);
+        sb.from('legal_communications').insert({
+          user_id: user.id, from_party: 'Adam Konopko', to_party: 'Marta',
+          subject: d.subject_line || 'OFW Draft', summary: d.rewritten_message || text,
+          was_copied: true, flagged: false, communication_date: new Date().toISOString()
+        });
+        toast('\u2705 Draft copied + logged to communications', 'success');
+      } catch(e) { toast('Copied to clipboard', 'success'); }
+    } else {
+      toast('Copied to clipboard', 'success');
+    }
+  }).catch(function() {
+    var range = document.createRange(); range.selectNodeContents(el);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(range);
+    document.execCommand('copy');
+    sel.removeAllRanges();
+    toast('Copied to clipboard', 'success');
+  });
+}
+
+// Email Defense — high risk auto-flag
+function emailDefenseAutoFlag(jsonStr) {
+  var d = JSON.parse(jsonStr);
+  var prefill = (d.actual_intent || '') + '\n\n' + (d.risk_explanation || '');
+  switchView('capture');
+  setTimeout(function() {
+    setIntakeMode('guided');
+    var domainBtns = document.querySelectorAll('.domain-btn');
+    domainBtns.forEach(function(b) { if (b.textContent.trim().toLowerCase().includes('legal')) b.click(); });
+    setTimeout(function() {
+      var firstTA = document.querySelector('.guided-form textarea, .guided-form input[type="text"]');
+      if (firstTA) firstTA.value = prefill;
+    }, 100);
+  }, 100);
+  toast('Pre-filled from Email Defense analysis', 'info');
+}
+
+// Doc Analysis — Create Deadline from date
+function docAnalysisCreateDeadline(jsonStr) {
+  var d = JSON.parse(jsonStr);
+  document.getElementById('sce-title').value = d.context || 'Deadline';
+  document.getElementById('sce-date').value = d.date || '';
+  document.getElementById('sce-type').value = 'deadline';
+  document.getElementById('sce-domain').value = 'legal';
+  openSheet('sheet-new-cal-event');
+}
+
+// Doc Analysis — Create Financial Flag from amount
+async function docAnalysisCreateFlag(jsonStr) {
+  var d = JSON.parse(jsonStr);
+  var amtStr = (d.amount || '').replace(/[^0-9.]/g, '');
+  var amt = parseFloat(amtStr) || 0;
+  var flag = { id: crypto.randomUUID(), flag_type: 'audit_finding', title: d.context || 'Doc analysis flag', vendor: 'Doc Analysis', amount: amt, source_system: 'doc-analysis', status: 'pending', created_at: new Date().toISOString() };
+  if (isDemo) { demo.flags.push(flag); }
+  else { try { flag.user_id = user.id; await sb.from('financial_flags').insert(flag); } catch(e) { toast('Error creating flag', 'error'); return; } }
+  toast('Financial flag created: $' + amt.toLocaleString(), 'success');
+}
+
+// Briefing — Act on This
+function actOnInsight(id) {
+  var allInsights = isDemo ? demo.insights : [];
+  var insight = allInsights.find(function(i) { return i.id === id; });
+  if (!insight) return;
+  switchView('capture');
+  toggleInsights();
+  setTimeout(function() {
+    setIntakeMode('radio');
+    setTimeout(function() {
+      var ci = document.getElementById('capture-input');
+      if (ci) { ci.value = insight.content || ''; ci.dispatchEvent(new Event('input')); }
+    }, 100);
+  }, 100);
+  toast('Loaded into intake', 'info');
+}
+
+// Intel History
+async function loadIntelHistory() {
+  var el = document.getElementById('intel-results');
+  el.innerHTML = '<div class="panel-loading"><div class="spinner-sm"></div></div>';
+  el.classList.add('visible');
+  var items = [];
+  if (isDemo) {
+    items = (demo.insights || []).filter(function(i) { return i.metadata && i.metadata.source === 'intelligence-console'; }).sort(function(a, b) { return new Date(b.created_at) - new Date(a.created_at); }).slice(0, 50);
+  } else {
+    try {
+      var r = await sb.from('ai_insights').select('*').eq('metadata->>source', 'intelligence-console').order('created_at', { ascending: false }).limit(50);
+      items = r.data || [];
+    } catch(e) { console.error('Intel history:', e); }
+  }
+  renderIntelHistory(items);
+}
+
+function renderIntelHistory(items) {
+  var el = document.getElementById('intel-results');
+  if (!items.length) { el.innerHTML = '<div class="panel-empty" style="padding:40px 20px"><div class="empty-icon">&#129504;</div><p>No analysis history yet. Run an analysis first.</p></div>'; el.classList.add('visible'); return; }
+  var h = items.map(function(i) {
+    var mode = (i.metadata && i.metadata.mode) || i.insight_type || 'unknown';
+    var preview = '';
+    try { var parsed = typeof i.content === 'string' ? JSON.parse(i.content) : i.content; preview = JSON.stringify(parsed).substring(0, 100) + '...'; } catch(e) { preview = (i.content || '').substring(0, 100) + '...'; }
+    var dt = new Date(i.created_at);
+    var dateStr = dt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) + ' ' + dt.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    var card = '<div class="intel-history-card" onclick="replayIntelHistory(\'' + i.id + '\')">';
+    card += '<div class="intel-history-meta"><span class="intel-history-mode">' + esc(mode.replace(/_/g, ' ')) + '</span><span class="intel-history-date">' + dateStr + '</span></div>';
+    card += '<div class="intel-history-preview">' + esc(preview) + '</div>';
+    card += '<div class="intel-history-actions"><button class="suggest-pill" onclick="event.stopPropagation();deleteIntelHistory(\'' + i.id + '\')" style="border-color:var(--red-med);color:var(--red)">Delete</button></div>';
+    card += '</div>';
+    return card;
+  }).join('');
+  el.innerHTML = h;
+  el.classList.add('visible');
+}
+
+function replayIntelHistory(id) {
+  var items = isDemo ? demo.insights : [];
+  var item = items.find(function(i) { return i.id === id; });
+  if (!item) return;
+  var mode = (item.metadata && item.metadata.mode) || item.insight_type || 'ofw_draft';
+  try {
+    var parsed = typeof item.content === 'string' ? JSON.parse(item.content) : item.content;
+    setIntelMode(mode);
+    renderIntelResults(mode, parsed);
+  } catch(e) { toast('Could not replay this analysis', 'error'); }
+}
+
+async function deleteIntelHistory(id) {
+  if (isDemo) { demo.insights = demo.insights.filter(function(i) { return i.id !== id; }); }
+  else { try { await sb.from('ai_insights').delete().eq('id', id); } catch(e) { toast('Error deleting', 'error'); return; } }
+  toast('History item deleted', 'success');
+  loadIntelHistory();
+}
+
+// Live case context dropdown
+async function loadIntelCaseContext() {
+  var sel = document.getElementById('intel-context-select');
+  if (!sel) return;
+  var val = sel.value;
+  sel.innerHTML = '<option value="">No case context</option>';
+  var matters = [];
+  if (isDemo) { matters = (demo.matters || []).filter(function(m) { return m.status !== 'completed'; }); }
+  else { try { var r = await sb.from('legal_matters').select('id,case_name,case_number').neq('status', 'completed').order('case_name'); matters = r.data || []; } catch(e) {} }
+  matters.forEach(function(m) {
+    var label = esc(m.case_name) + (m.case_number ? ' \u2014 ' + esc(m.case_number) : '');
+    sel.innerHTML += '<option value="' + esc(m.case_name + (m.case_number ? ' \u2014 ' + m.case_number : '')) + '">' + label + '</option>';
+  });
+  sel.value = val;
+}
+
+// Capture suggestion pill handlers
+function suggestDeadlineFromCapture() {
+  var text = (document.getElementById('capture-input').value || '').substring(0, 80);
+  document.getElementById('sce-title').value = text;
+  document.getElementById('sce-type').value = 'deadline';
+  document.getElementById('sce-date').value = fmtDateStr(new Date());
+  openSheet('sheet-new-cal-event');
+}
+
+async function suggestFlagFromCapture() {
+  var text = document.getElementById('capture-input').value || '';
+  var parsed = parseInput(text);
+  var amtStr = parsed && parsed.amount ? parsed.amount.replace(/[^0-9.]/g, '') : '0';
+  var amt = parseFloat(amtStr) || 0;
+  var flag = { id: crypto.randomUUID(), flag_type: parsed && parsed.flagType ? parsed.flagType : 'audit_finding', title: text.substring(0, 100), vendor: 'Quick Capture', amount: amt, source_system: 'quick-capture', status: 'pending', created_at: new Date().toISOString() };
+  if (isDemo) { demo.flags.push(flag); }
+  else { try { flag.user_id = user.id; await sb.from('financial_flags').insert(flag); } catch(e) { toast('Error', 'error'); return; } }
+  toast('Flag created: $' + amt.toLocaleString(), 'success');
+}
+
+function suggestEmailDefense() {
+  var text = document.getElementById('capture-input').value || '';
+  switchView('intel');
+  setTimeout(function() {
+    setIntelMode('email_defense');
+    document.getElementById('intel-input').value = text;
+    document.getElementById('capture-input').value = '';
+    var box = document.getElementById('parse-box');
+    if (box) box.classList.remove('visible');
+  }, 100);
+  toast('Moved to Intelligence Console', 'info');
 }
 
 // ================================================================
