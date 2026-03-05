@@ -1,0 +1,617 @@
+{
+  "exported_at": "2026-03-05T11:40:19.604Z",
+  "tables": {
+    "entries": {
+      "count": 17,
+      "data": [
+        {
+          "id": "edaf3a04-11b0-40cf-8765-008aeeaf0aa4",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "creatate a routine that balneces like work kaleesi ashley big girl and find time for myself as well. give me a start of the day when i have kaeesi what time i should wake up drop her offf at daycare and what not to do in the car, i notice i hyperfocus on my phone a lot, but when i listen to usic on my way to work it relaxes me. need to stabalize more. Suggest a highly rated therapis near hodgkins il",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family",
+            "personnel"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {},
+          "created_at": "2026-03-05T06:21:17.152992+00:00",
+          "updated_at": "2026-03-05T06:21:17.152992+00:00"
+        },
+        {
+          "id": "2ac9bb47-25f9-4c0b-9773-6a4e41084e7f",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "ashleys birthday on 3/11 give me some god brthday ideas aside from the typicl dinner in chicago, its supposed to be 70 degrees outside and shes been trying to rekindle with her family",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {},
+          "created_at": "2026-03-05T06:16:58.098258+00:00",
+          "updated_at": "2026-03-05T06:16:58.098258+00:00"
+        },
+        {
+          "id": "4f24d80d-cd20-4444-80b4-7dbfcb722e7b",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "Finish up gal intake shet and debrieg ashle and chris",
+          "domain": "legal",
+          "priority": "critical",
+          "tags": [],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {},
+          "created_at": "2026-03-05T06:13:43.167035+00:00",
+          "updated_at": "2026-03-05T06:13:43.167035+00:00"
+        },
+        {
+          "id": "90515767-ecc8-4912-ad80-f171acfd5a91",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "Assist with building out new us cargo website www.uscbrokers.live",
+          "domain": "general",
+          "priority": "medium",
+          "tags": [],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {},
+          "created_at": "2026-03-05T06:12:55.9411+00:00",
+          "updated_at": "2026-03-05T06:12:55.9411+00:00"
+        },
+        {
+          "id": "edddae22-ec57-4a62-8acb-b6aa318005b4",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "How can i make Ashley happy,",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "personnel"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {},
+          "created_at": "2026-03-05T06:12:06.311981+00:00",
+          "updated_at": "2026-03-05T06:12:06.311981+00:00"
+        },
+        {
+          "id": "18a11780-3cb0-43e1-ae74-42392e28f9c0",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "part 8 save for draft to marta and marc about kaleesi daycare enrollment finished",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/18a11780-3cb0-43e1-ae74-42392e28f9c0/1772671377465-0.pdf",
+                "name": "Child Introduction Form - Google Docs.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/18a11780-3cb0-43e1-ae74-42392e28f9c0/1772671377465-0.pdf",
+                "size": 322455,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/18a11780-3cb0-43e1-ae74-42392e28f9c0/1772671377971-1.pdf",
+                "name": "ASQ-3_English_Questionnaire.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/18a11780-3cb0-43e1-ae74-42392e28f9c0/1772671377971-1.pdf",
+                "size": 441545,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/18a11780-3cb0-43e1-ae74-42392e28f9c0/1772671378585-2.pdf",
+                "name": "ASQ_SE-2_English_Questionnaire.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/18a11780-3cb0-43e1-ae74-42392e28f9c0/1772671378585-2.pdf",
+                "size": 904806,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:42:56.414789+00:00",
+          "updated_at": "2026-03-05T00:42:58.439456+00:00"
+        },
+        {
+          "id": "15267280-a480-4f4e-82e6-02ec4c40f3f3",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "part 7 save for draft to marta and marc about kaleesi daycare enrollment will attache a more files",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671330409-0.pdf",
+                "name": "2025 physical.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671330409-0.pdf",
+                "size": 233966,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671330804-1.pdf",
+                "name": "PR178 Allergies - Allergy and Dietary Needs Form (002).pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671330804-1.pdf",
+                "size": 373074,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671331210-2.pdf",
+                "name": "Primrose Application for Enrollment - Blank (002).pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671331210-2.pdf",
+                "size": 972948,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671331774-3.pdf",
+                "name": "PR390 Photography Video Social Media Release - Student.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671331774-3.pdf",
+                "size": 180938,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671332139-4.pdf",
+                "name": "Parental Authorization for Medication - PR82.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/15267280-a480-4f4e-82e6-02ec4c40f3f3/1772671332139-4.pdf",
+                "size": 343888,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:42:09.364535+00:00",
+          "updated_at": "2026-03-05T00:42:11.551558+00:00"
+        },
+        {
+          "id": "fc9bfb7d-8459-40e6-be0f-3947d43563c1",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "part 6 save for draft to marta and marc about kaleesi daycare enrollment will attache a more files",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671306216-0.pdf",
+                "name": "DCFS CFS_1050-52_Summary_for_DCC.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671306216-0.pdf",
+                "size": 419022,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671306811-1.pdf",
+                "name": "Child Introduction Form - Google Docs.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671306811-1.pdf",
+                "size": 322455,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671307162-2.pdf",
+                "name": "PS of Plainfield - Parent-Therapist Authorization Form.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671307162-2.pdf",
+                "size": 664178,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671307619-3.pdf",
+                "name": "Primrose School of Plainfield Parent Handbook 2025-2026 Addendum.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671307619-3.pdf",
+                "size": 1274543,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671308297-4.pdf",
+                "name": "_Early Preschool 1_2025.docx.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/fc9bfb7d-8459-40e6-be0f-3947d43563c1/1772671308297-4.pdf",
+                "size": 190256,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:41:45.171321+00:00",
+          "updated_at": "2026-03-05T00:41:47.706243+00:00"
+        },
+        {
+          "id": "abd828bd-7cd1-492c-8f66-4022dea27cf4",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "part 5 save for draft to marta and marc about kaleesi daycare enrollment will attache a more files",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671277979-0.pdf",
+                "name": "Classroom Welcome Letter - Early Preschool updates 2025 - Google Docs.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671277979-0.pdf",
+                "size": 110878,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671278573-1.pdf",
+                "name": "All Weekly Menus 2023.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671278573-1.pdf",
+                "size": 272351,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671278953-2.pdf",
+                "name": "Molly's Math Bag - Program Description 2025 updated.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671278953-2.pdf",
+                "size": 199601,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671279920-3.pdf",
+                "name": "Rules of the Roost Parent Letter.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671279920-3.pdf",
+                "size": 66999,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671280244-4.pdf",
+                "name": "Procare Connect Flyer.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/abd828bd-7cd1-492c-8f66-4022dea27cf4/1772671280244-4.pdf",
+                "size": 559765,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:41:16.929597+00:00",
+          "updated_at": "2026-03-05T00:41:19.724867+00:00"
+        },
+        {
+          "id": "02f621e8-cbba-4a10-867c-30e4bde185a9",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "part 4 save for draft to marta and marc about kaleesi daycare enrollment will attache a more files",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671263118-0.pdf",
+                "name": "Virtual Brochure - Balanced Learning updated 2025.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671263118-0.pdf",
+                "size": 7493747,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671264923-1.pdf",
+                "name": "Ogs Reading Bag Program - Parent Letter updated 2025.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671264923-1.pdf",
+                "size": 175095,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671265265-2.pdf",
+                "name": "Parent Letter - Potty Training - PR99 (1).pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671265265-2.pdf",
+                "size": 51663,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671265521-3.pdf",
+                "name": "Parent Letter - Biting Information.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671265521-3.pdf",
+                "size": 65676,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671265788-4.pdf",
+                "name": "PS of Plainfield Safe School Plan Letter.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/02f621e8-cbba-4a10-867c-30e4bde185a9/1772671265788-4.pdf",
+                "size": 510513,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:41:02.060572+00:00",
+          "updated_at": "2026-03-05T00:41:05.180186+00:00"
+        },
+        {
+          "id": "688129bc-22e2-439f-8e83-6fec27953819",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "part 3 save for draft to marta and marc about kaleesi daycare enrollment will attache a more files",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671248507-0.pdf",
+                "name": "Primrose Birthday Book Program.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671248507-0.pdf",
+                "size": 133634,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671248942-1.pdf",
+                "name": "Primrose Plainfield - Child Care Weather Watch.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671248942-1.pdf",
+                "size": 340705,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671249306-2.pdf",
+                "name": "Birthday Party Package.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671249306-2.pdf",
+                "size": 167956,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671249590-3.pdf",
+                "name": "PS of Plainfield Uniform Policy Information.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671249590-3.pdf",
+                "size": 160489,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671249874-4.pdf",
+                "name": "Primrose School Plainfield Annual Calendar 2025-26.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/688129bc-22e2-439f-8e83-6fec27953819/1772671249874-4.pdf",
+                "size": 181696,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:40:47.459815+00:00",
+          "updated_at": "2026-03-05T00:40:49.271894+00:00"
+        },
+        {
+          "id": "60c8fa83-a3ff-47cf-9083-8e79a3f89a1d",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "part 2 save for draft to marta and marc about kaleesi daycare enrollment will attache a more files",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": true,
+          "resolved_at": "2026-03-05T06:22:32.556+00:00",
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671228130-0.pdf",
+                "name": "DCFS CFS_1050-52_Summary_for_DCC.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671228130-0.pdf",
+                "size": 419022,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671228583-1.pdf",
+                "name": "Child Introduction Form - Google Docs.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671228583-1.pdf",
+                "size": 322455,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671229256-2.pdf",
+                "name": "ASQ-3_English_Questionnaire.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671229256-2.pdf",
+                "size": 441545,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671229921-3.pdf",
+                "name": "ASQ_SE-2_English_Questionnaire.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671229921-3.pdf",
+                "size": 904806,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671230478-4.pdf",
+                "name": "PS of Plainfield - Parent-Therapist Authorization Form.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/60c8fa83-a3ff-47cf-9083-8e79a3f89a1d/1772671230478-4.pdf",
+                "size": 664178,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:40:27.085309+00:00",
+          "updated_at": "2026-03-05T06:22:32.92132+00:00"
+        },
+        {
+          "id": "ffa9666e-7aae-442f-b9e4-054d641b800d",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "save for draft to marta and marc about kaleesi daycare enrollment will attache a more files",
+          "domain": "personal",
+          "priority": "medium",
+          "tags": [
+            "family"
+          ],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671204947-0.pdf",
+                "name": "PR178 Allergies - Allergy and Dietary Needs Form (002).pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671204947-0.pdf",
+                "size": 373074,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671205390-1.pdf",
+                "name": "Primrose Application for Enrollment - Blank (002).pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671205390-1.pdf",
+                "size": 972948,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671206198-2.pdf",
+                "name": "PR390 Photography Video Social Media Release - Student.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671206198-2.pdf",
+                "size": 180938,
+                "type": "application/pdf"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671206819-3.pdf",
+                "name": "Parental Authorization for Medication - PR82.pdf",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/ffa9666e-7aae-442f-b9e4-054d641b800d/1772671206819-3.pdf",
+                "size": 343888,
+                "type": "application/pdf"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:40:03.898537+00:00",
+          "updated_at": "2026-03-05T00:40:06.282927+00:00"
+        },
+        {
+          "id": "f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "vector files to print decals for at vista print",
+          "domain": "general",
+          "priority": "medium",
+          "tags": [],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {
+            "files": [
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671106895-0.zip",
+                "name": "SVG.zip",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671106895-0.zip",
+                "size": 78402,
+                "type": "application/x-zip-compressed"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671107469-1.zip",
+                "name": "2024Mercedes__Separatefiles-Whites.zip",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671107469-1.zip",
+                "size": 9902247,
+                "type": "application/x-zip-compressed"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671109800-2.zip",
+                "name": "DXF.zip",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671109800-2.zip",
+                "size": 680001,
+                "type": "application/x-zip-compressed"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671110301-3.zip",
+                "name": "EPS.zip",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671110301-3.zip",
+                "size": 2054793,
+                "type": "application/x-zip-compressed"
+              },
+              {
+                "url": "https://hpprebdyvnfczplaaych.supabase.co/storage/v1/object/public/paddock-files/014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671111136-4.zip",
+                "name": "PNG.zip",
+                "path": "014ddd84-9083-4597-b5c4-7ee613f7c428/f1fb83f1-11d0-4092-ad8d-cc3c0a79a9f8/1772671111136-4.zip",
+                "size": 2431654,
+                "type": "application/x-zip-compressed"
+              }
+            ]
+          },
+          "created_at": "2026-03-05T00:38:25.838537+00:00",
+          "updated_at": "2026-03-05T00:38:31.106711+00:00"
+        },
+        {
+          "id": "f859aa04-4315-4960-b285-5eeab63f8ada",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "need advice on finding an attorney for will county tennant- laura dispute at 16516 w apache dr",
+          "domain": "general",
+          "priority": "medium",
+          "tags": [
+            "legal-counsel"
+          ],
+          "is_actionable": false,
+          "resolved": true,
+          "resolved_at": "2026-03-05T00:26:06.495+00:00",
+          "metadata": {
+            "flag_type": "audit_finding"
+          },
+          "created_at": "2026-03-05T00:26:03.438857+00:00",
+          "updated_at": "2026-03-05T00:26:05.565723+00:00"
+        },
+        {
+          "id": "9c870081-d471-4b23-9d5b-0c1aacf66f35",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "Joined on court today, nicole janes said her and marta reached an agreement and will withdraw. Judge aknowledged my presnce on zoom. Ive attended every zoom call for court hoppe that looks good",
+          "domain": "legal",
+          "priority": "medium",
+          "tags": [
+            "family",
+            "legal-counsel"
+          ],
+          "is_actionable": false,
+          "resolved": true,
+          "resolved_at": "2026-03-05T00:25:05.485+00:00",
+          "metadata": {},
+          "created_at": "2026-03-05T00:25:02.439097+00:00",
+          "updated_at": "2026-03-05T00:25:04.548921+00:00"
+        },
+        {
+          "id": "c91885bf-8cb1-4c36-ace0-64551882870a",
+          "user_id": "014ddd84-9083-4597-b5c4-7ee613f7c428",
+          "content": "mark has still not gotten back to me",
+          "domain": "legal",
+          "priority": "critical",
+          "tags": [],
+          "is_actionable": false,
+          "resolved": false,
+          "resolved_at": null,
+          "metadata": {},
+          "created_at": "2026-03-05T00:20:26.859357+00:00",
+          "updated_at": "2026-03-05T00:20:26.859357+00:00"
+        }
+      ]
+    },
+    "legal_matters": {
+      "count": 0,
+      "data": []
+    },
+    "legal_deadlines": {
+      "count": 0,
+      "data": []
+    },
+    "financial_flags": {
+      "count": 0,
+      "data": []
+    },
+    "tasks": {
+      "count": 0,
+      "data": []
+    },
+    "ai_insights": {
+      "count": 0,
+      "data": []
+    }
+  }
+}
