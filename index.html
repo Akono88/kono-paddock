@@ -805,14 +805,21 @@ input, select, textarea { font-family: inherit; }
 }
 .insight-card:hover { border-color: var(--teal); transform: translateX(-2px); }
 .insight-card.highlighted { border-color: var(--teal); background: var(--teal-dim); box-shadow: var(--teal-glow); }
+.insight-card.sev-critical { border-color: var(--red); box-shadow: 0 0 12px rgba(225,6,0,0.15); }
+.insight-card.sev-critical:hover { box-shadow: var(--red-glow); }
+.insight-card.sev-high { border-left: 3px solid var(--red); }
+.insight-card.sev-medium { border-left: 3px solid var(--teal); }
+.insight-card.sev-low { border-left: 3px solid var(--carbon-500); }
+.insight-card.past { opacity: 0.55; }
+.insight-card.past:hover { opacity: 0.8; }
 
+.insight-top-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
 .insight-type-label {
   font-family: var(--font-display);
   font-size: 0.48rem;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  margin-bottom: 6px;
   display: flex; align-items: center; gap: 4px;
 }
 .insight-type-label.deadline_warning { color: var(--red); }
@@ -820,10 +827,34 @@ input, select, textarea { font-family: inherit; }
 .insight-type-label.suggestion       { color: var(--teal); }
 .insight-type-label.anomaly          { color: var(--rose); }
 
-.insight-content { font-size: 0.82rem; color: var(--carbon-200); line-height: 1.55; margin-bottom: 8px; font-weight: 400; }
-.insight-footer { display: flex; align-items: center; justify-content: space-between; }
+.insight-severity-badge {
+  font-family: var(--font-display);
+  font-size: 0.42rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 2px 7px; border-radius: 3px;
+}
+.insight-severity-badge.critical { background: var(--red-med); color: var(--red); }
+.insight-severity-badge.high { background: var(--red-dim); color: #ff9999; }
+.insight-severity-badge.medium { background: var(--teal-dim); color: var(--teal); }
+.insight-severity-badge.low { background: var(--carbon-700); color: var(--carbon-400); }
+
+.insight-domain-tag {
+  font-family: var(--font-display);
+  font-size: 0.42rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+  padding: 2px 6px; border-radius: 3px;
+  background: var(--carbon-700); color: var(--carbon-400);
+}
+.insight-domain-tag.legal { color: var(--amber); background: rgba(245,158,11,0.1); }
+.insight-domain-tag.financial { color: var(--green); background: var(--green-dim); }
+.insight-domain-tag.operations { color: var(--blue); background: var(--blue-dim); }
+.insight-domain-tag.hr { color: var(--purple); background: rgba(168,85,247,0.1); }
+.insight-domain-tag.personal { color: var(--rose); background: rgba(244,63,94,0.1); }
+
+.insight-title { font-family: var(--font-body); font-size: 0.85rem; font-weight: 600; color: var(--carbon-100); margin-bottom: 4px; line-height: 1.35; }
+.insight-content { font-size: 0.82rem; color: var(--carbon-300); line-height: 1.55; margin-bottom: 8px; font-weight: 400; }
+.insight-footer { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .insight-time { font-family: var(--font-display); font-size: 0.5rem; font-weight: 500; color: var(--carbon-500); }
-.insight-ack {
+.insight-actions { display: flex; gap: 5px; }
+.insight-btn {
   padding: 3px 10px;
   background: transparent;
   border: 1px solid var(--carbon-600);
@@ -837,7 +868,23 @@ input, select, textarea { font-family: inherit; }
   text-transform: uppercase;
   transition: all 0.12s;
 }
-.insight-ack:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.insight-btn:hover { border-color: var(--teal); color: var(--teal); }
+.insight-btn.ack-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.insight-btn.copy-btn:hover { border-color: var(--blue); color: var(--blue); }
+
+.insights-tabs {
+  display: flex; gap: 0; padding: 0 12px; flex-shrink: 0;
+  border-bottom: 1px solid var(--carbon-700);
+}
+.insights-tab {
+  flex: 1; padding: 9px 0; text-align: center;
+  font-family: var(--font-display); font-size: 0.5rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--carbon-500); background: none; border: none; border-bottom: 2px solid transparent;
+  cursor: pointer; transition: all 0.15s;
+}
+.insights-tab:hover { color: var(--carbon-300); }
+.insights-tab.active { color: var(--teal); border-bottom-color: var(--teal); }
 
 .insights-generate {
   margin: 12px;
@@ -856,6 +903,8 @@ input, select, textarea { font-family: inherit; }
   flex-shrink: 0;
 }
 .insights-generate:hover { background: var(--teal-med); box-shadow: var(--teal-glow); }
+.insights-generate:disabled { opacity: 0.4; cursor: not-allowed; }
+.insights-generate .gen-spinner { display: none; width: 12px; height: 12px; border: 2px solid var(--teal); border-top-color: transparent; border-radius: 50%; animation: spin 0.6s linear infinite; }
 
 /* ================================================================
    TOASTS
@@ -1174,6 +1223,339 @@ input, select, textarea { font-family: inherit; }
 }
 .upload-progress.active { display: block; }
 .upload-progress-bar { height: 100%; background: var(--teal); width: 0%; transition: width 0.3s; }
+
+/* ================================================================
+   BOTTOM SHEET
+   ================================================================ */
+.sheet-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 300;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.25s, visibility 0.25s;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+}
+.sheet-backdrop.open { opacity: 1; visibility: visible; }
+
+.bottom-sheet {
+  position: fixed; left: 0; right: 0; bottom: 0;
+  max-height: 85vh;
+  background: var(--carbon-800);
+  border-top: 2px solid var(--teal);
+  border-radius: 14px 14px 0 0;
+  z-index: 301;
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex; flex-direction: column;
+  box-shadow: 0 -10px 60px rgba(0,0,0,0.6);
+  overflow: hidden;
+}
+.bottom-sheet.open { transform: translateY(0); }
+
+.sheet-handle {
+  display: flex; justify-content: center; padding: 10px 0 4px; flex-shrink: 0; cursor: grab;
+}
+.sheet-handle::before {
+  content: ''; width: 36px; height: 4px;
+  background: var(--carbon-600); border-radius: 2px;
+}
+
+.sheet-header {
+  padding: 4px 20px 14px;
+  border-bottom: 1px solid var(--carbon-700);
+  display: flex; align-items: center; justify-content: space-between;
+  flex-shrink: 0;
+}
+.sheet-title {
+  font-family: var(--font-display);
+  font-size: 0.62rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.1em;
+  color: var(--teal);
+}
+.sheet-close {
+  width: 44px; height: 44px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--carbon-600);
+  border-radius: var(--r-sm); color: var(--carbon-400);
+  font-size: 1rem; cursor: pointer; transition: all 0.12s;
+  min-width: 44px; min-height: 44px;
+}
+.sheet-close:hover { border-color: var(--red); color: var(--red); }
+
+.sheet-body {
+  flex: 1; overflow-y: auto; padding: 20px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.sheet-field { margin-bottom: 14px; }
+.sheet-label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.52rem; font-weight: 600;
+  color: var(--carbon-400);
+  text-transform: uppercase; letter-spacing: 0.12em;
+  margin-bottom: 6px;
+}
+.sheet-input, .sheet-select, .sheet-textarea {
+  width: 100%; padding: 12px 14px;
+  background: var(--carbon-900);
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-md);
+  color: var(--white);
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  min-height: 44px;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.sheet-input:focus, .sheet-select:focus, .sheet-textarea:focus {
+  outline: none; border-color: var(--teal); box-shadow: var(--teal-glow);
+}
+.sheet-input::placeholder, .sheet-textarea::placeholder { color: var(--carbon-600); font-style: italic; }
+.sheet-textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+.sheet-select {
+  font-family: var(--font-display);
+  font-size: 0.72rem; font-weight: 500;
+  color: var(--carbon-300);
+  appearance: auto;
+}
+.sheet-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.sheet-check {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.82rem; color: var(--carbon-300);
+  cursor: pointer; user-select: none;
+  min-height: 44px;
+}
+.sheet-check input { accent-color: var(--teal); width: 18px; height: 18px; }
+
+.sheet-submit {
+  width: 100%; padding: 14px;
+  background: var(--teal);
+  color: var(--carbon-950);
+  border: none; border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 0.65rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  min-height: 48px; cursor: pointer;
+  transition: filter 0.12s, box-shadow 0.2s;
+  margin-top: 8px;
+}
+.sheet-submit:hover { filter: brightness(1.15); box-shadow: var(--teal-glow); }
+.sheet-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ================================================================
+   TASK CARDS
+   ================================================================ */
+.task-list { display: flex; flex-direction: column; gap: 8px; }
+.task-card {
+  background: var(--carbon-800);
+  border: 1px solid var(--carbon-700);
+  border-radius: var(--r-lg);
+  padding: 14px 16px;
+  transition: border-color 0.15s;
+  position: relative;
+}
+.task-card:hover { border-color: var(--carbon-600); }
+.task-card.completed { opacity: 0.45; }
+.task-card.completed .task-title { text-decoration: line-through; }
+
+.task-top { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+.task-title {
+  font-size: 0.88rem; font-weight: 600;
+  color: var(--carbon-100); flex: 1; min-width: 0;
+  word-break: break-word; line-height: 1.4;
+}
+.task-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+.task-due {
+  font-family: var(--font-display);
+  font-size: 0.5rem; font-weight: 600;
+  color: var(--carbon-400); letter-spacing: 0.04em;
+}
+.task-due.overdue { color: var(--red); }
+.task-link-chip {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 2px;
+  background: var(--teal-dim); border: 1px solid rgba(0,161,155,0.15);
+  font-family: var(--font-display);
+  font-size: 0.46rem; font-weight: 600;
+  color: var(--teal); text-transform: uppercase;
+  letter-spacing: 0.04em; cursor: pointer;
+  transition: all 0.12s; min-height: 28px;
+}
+.task-link-chip:hover { background: var(--teal-med); border-color: var(--teal); }
+
+.task-actions { display: flex; gap: 6px; }
+.task-action-btn {
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-sm);
+  color: var(--carbon-400);
+  font-family: var(--font-display);
+  font-size: 0.52rem; font-weight: 600;
+  letter-spacing: 0.04em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.12s;
+  min-height: 36px; min-width: 44px;
+  display: flex; align-items: center; justify-content: center;
+}
+.task-action-btn:hover { border-color: var(--teal); color: var(--teal); }
+.task-action-btn.complete-btn:hover { border-color: var(--green); color: var(--green); background: var(--green-dim); }
+.task-action-btn.delete-btn:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+
+.view-top-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 18px; flex-wrap: wrap; gap: 10px;
+}
+.view-add-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px;
+  background: var(--teal);
+  color: var(--carbon-950);
+  border: none; border-radius: var(--r-md);
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 0.58rem;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.15s;
+  min-height: 44px;
+}
+.view-add-btn:hover { filter: brightness(1.15); box-shadow: var(--teal-glow); }
+
+/* ================================================================
+   CREW CARDS
+   ================================================================ */
+.crew-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 10px; }
+.crew-card {
+  background: var(--carbon-800);
+  border: 1px solid var(--carbon-700);
+  border-radius: var(--r-lg);
+  padding: 16px 18px;
+  transition: border-color 0.15s;
+  cursor: pointer;
+}
+.crew-card:hover { border-color: var(--carbon-600); }
+.crew-card.inactive { opacity: 0.5; }
+
+.crew-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.crew-avatar {
+  width: 36px; height: 36px;
+  background: var(--teal-med);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 700; font-size: 0.6rem;
+  color: var(--teal); flex-shrink: 0;
+}
+.crew-name { font-size: 0.92rem; font-weight: 600; color: var(--carbon-100); }
+.crew-role { font-size: 0.72rem; color: var(--carbon-400); margin-top: 1px; }
+.crew-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.crew-status-badge {
+  display: inline-flex; padding: 3px 10px; border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 0.48rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+.crew-status-badge.active { background: var(--green-dim); color: var(--green); }
+.crew-status-badge.inactive-badge { background: var(--red-dim); color: var(--red); }
+.crew-start {
+  font-family: var(--font-display);
+  font-size: 0.48rem; font-weight: 500;
+  color: var(--carbon-500); letter-spacing: 0.04em;
+}
+.crew-toggle-btn {
+  margin-left: auto;
+  padding: 6px 12px;
+  background: transparent;
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-sm);
+  color: var(--carbon-400);
+  font-family: var(--font-display);
+  font-size: 0.48rem; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.04em;
+  cursor: pointer; transition: all 0.12s;
+  min-height: 36px;
+}
+.crew-toggle-btn:hover { border-color: var(--teal); color: var(--teal); }
+
+.crew-expand {
+  display: none; margin-top: 12px; padding-top: 12px;
+  border-top: 1px solid var(--carbon-700);
+}
+.crew-expand.open { display: block; }
+
+.onboard-list { display: flex; flex-direction: column; gap: 4px; }
+.onboard-item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 6px 10px;
+  background: var(--carbon-750);
+  border-radius: var(--r-sm);
+  font-size: 0.78rem; color: var(--carbon-300);
+}
+.onboard-item.done { opacity: 0.4; text-decoration: line-through; }
+.onboard-check { accent-color: var(--teal); width: 16px; height: 16px; cursor: pointer; }
+.onboard-label { font-family: var(--font-display); font-size: 0.48rem; font-weight: 600; color: var(--carbon-500); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+
+/* ================================================================
+   ACTIVITY FEED
+   ================================================================ */
+.feed-list { display: flex; flex-direction: column; gap: 4px; }
+.feed-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px;
+  background: var(--carbon-800);
+  border: 1px solid var(--carbon-700);
+  border-radius: var(--r-md);
+  border-left: 3px solid var(--carbon-500);
+  transition: background 0.1s;
+}
+.feed-item:hover { background: var(--carbon-750); }
+.feed-item[data-tbl="entries"]        { border-left-color: var(--blue); }
+.feed-item[data-tbl="tasks"]          { border-left-color: var(--teal); }
+.feed-item[data-tbl="financial_flags"]{ border-left-color: var(--green); }
+.feed-item[data-tbl="legal_matters"]  { border-left-color: var(--purple); }
+.feed-item[data-tbl="legal_deadlines"]{ border-left-color: var(--purple); }
+.feed-item[data-tbl="employees"]      { border-left-color: var(--rose); }
+
+.feed-action {
+  font-family: var(--font-display);
+  font-size: 0.5rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.06em;
+  min-width: 50px;
+}
+.feed-action.insert { color: var(--green); }
+.feed-action.update { color: var(--blue); }
+.feed-action.delete { color: var(--red); }
+
+.feed-table {
+  font-family: var(--font-display);
+  font-size: 0.52rem; font-weight: 600;
+  color: var(--carbon-300);
+  text-transform: uppercase; letter-spacing: 0.04em;
+  background: var(--carbon-750);
+  padding: 2px 8px; border-radius: 2px;
+}
+.feed-time {
+  margin-left: auto;
+  font-family: var(--font-display);
+  font-size: 0.48rem; font-weight: 500;
+  color: var(--carbon-500); letter-spacing: 0.04em;
+  flex-shrink: 0;
+}
+.feed-id {
+  font-family: var(--font-display);
+  font-size: 0.46rem; font-weight: 500;
+  color: var(--carbon-500);
+}
+
+/* ================================================================
+   LEGAL ACTION BUTTONS
+   ================================================================ */
+.legal-action-bar {
+  display: flex; gap: 6px; margin-bottom: 14px; flex-wrap: wrap;
+}
+.legal-action-bar .view-add-btn { font-size: 0.52rem; padding: 8px 14px; min-height: 40px; }
+.matter-row-actions { display: flex; gap: 4px; }
+.matter-row-actions .row-action-btn { font-size: 0.5rem; padding: 3px 8px; min-height: 32px; }
 </style>
 </head>
 <body>
@@ -1212,6 +1594,12 @@ input, select, textarea { font-family: inherit; }
       <div class="sidebar-section-label">Race Engineering</div>
       <button class="nav-item" data-view="intel"><span class="nav-icon">&#9783;</span> Intelligence</button>
       <button class="nav-item" id="nav-insights-btn" onclick="toggleInsights()"><span class="nav-icon">&#9880;</span> Briefings <span class="nav-badge" id="nav-insight-badge" style="display:none">0</span></button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-section-label">Operations</div>
+      <button class="nav-item" data-view="tasks"><span class="nav-icon">&#128203;</span> Tasks</button>
+      <button class="nav-item" data-view="crew"><span class="nav-icon">&#128101;</span> Crew</button>
+      <button class="nav-item" data-view="activity"><span class="nav-icon">&#128220;</span> Activity Feed</button>
     </div>
     <div class="sidebar-footer">
       <div class="user-info">
@@ -1339,8 +1727,18 @@ input, select, textarea { font-family: inherit; }
         <button class="tab-btn" data-subtab="comms" data-parent="legal">Communications</button>
       </div>
       <div class="sub-view active" id="sub-deadlines"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Deadline</th><th>Title</th><th>Case</th><th>Priority</th><th>Status</th><th></th></tr></thead><tbody id="legal-deadlines-tbody"><tr><td colspan="6"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
-      <div class="sub-view" id="sub-matters"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Type</th><th>Court</th><th>Attorney</th><th>Status</th></tr></thead><tbody id="legal-matters-tbody"><tr><td colspan="5"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
-      <div class="sub-view" id="sub-comms"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Subject</th><th>CC'd?</th><th>Flagged</th></tr></thead><tbody id="legal-comms-tbody"><tr><td colspan="6"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
+      <div class="sub-view" id="sub-matters">
+        <div class="legal-action-bar">
+          <button class="view-add-btn" onclick="openSheet('sheet-new-matter')">+ New Matter</button>
+        </div>
+        <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Type</th><th>Court</th><th>Attorney</th><th>Status</th><th>Actions</th></tr></thead><tbody id="legal-matters-tbody"><tr><td colspan="6"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div>
+      </div>
+      <div class="sub-view" id="sub-comms">
+        <div class="legal-action-bar">
+          <button class="view-add-btn" onclick="openSheet('sheet-new-comm')">+ Log Communication</button>
+        </div>
+        <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>From</th><th>To</th><th>Subject</th><th>CC'd?</th><th>Flagged</th></tr></thead><tbody id="legal-comms-tbody"><tr><td colspan="6"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div>
+      </div>
     </div>
 
     <!-- FINANCIAL -->
@@ -1351,6 +1749,33 @@ input, select, textarea { font-family: inherit; }
       </div>
       <div class="sub-view active" id="sub-flags"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Type</th><th>Title</th><th>Vendor</th><th>Amount</th><th>Source</th><th>Status</th><th></th></tr></thead><tbody id="financial-flags-tbody"><tr><td colspan="7"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
       <div class="sub-view" id="sub-resolved"><div class="data-table-wrap"><table class="data-table"><thead><tr><th>Type</th><th>Title</th><th>Amount</th><th>Resolved</th><th>Resolution</th></tr></thead><tbody id="financial-resolved-tbody"><tr><td colspan="5"><div class="panel-loading"><div class="spinner-sm"></div></div></td></tr></tbody></table></div></div>
+    </div>
+
+    <!-- TASKS -->
+    <div class="view-container" id="view-tasks">
+      <div class="view-top-bar">
+        <span class="section-title">All Tasks</span>
+        <button class="view-add-btn" onclick="openSheet('sheet-new-task')">+ New Task</button>
+      </div>
+      <div class="task-list" id="tasks-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div>
+    </div>
+
+    <!-- CREW -->
+    <div class="view-container" id="view-crew">
+      <div class="view-top-bar">
+        <span class="section-title">Team Roster</span>
+        <button class="view-add-btn" onclick="openSheet('sheet-new-employee')">+ New Employee</button>
+      </div>
+      <div class="crew-grid" id="crew-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div>
+    </div>
+
+    <!-- ACTIVITY FEED -->
+    <div class="view-container" id="view-activity">
+      <div class="view-top-bar">
+        <span class="section-title">Activity Log</span>
+        <button class="section-action" onclick="loadActivityFeed()">Refresh</button>
+      </div>
+      <div class="feed-list" id="activity-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div>
     </div>
 
     <!-- INTELLIGENCE CONSOLE -->
@@ -1398,8 +1823,108 @@ input, select, textarea { font-family: inherit; }
 <div class="insights-backdrop" id="insights-backdrop" onclick="toggleInsights()"></div>
 <div class="insights-overlay" id="insights-panel">
   <div class="insights-header"><span class="insights-title"><span class="spark">&#9880;</span> Race Engineering Briefings</span><button class="insights-close" onclick="toggleInsights()">&#10005;</button></div>
+  <div class="insights-tabs">
+    <button class="insights-tab active" id="tab-unread" onclick="switchBriefingTab('unread')">Unread</button>
+    <button class="insights-tab" id="tab-history" onclick="switchBriefingTab('history')">History</button>
+  </div>
   <div class="insights-body" id="insights-list"><div class="panel-loading"><div class="spinner-sm"></div></div></div>
-  <button class="insights-generate" onclick="generateInsight()">&#9880; Request Briefing</button>
+  <button class="insights-generate" id="insights-gen-btn" onclick="generateInsight()"><span class="gen-spinner" id="gen-spinner"></span>&#9880; Request Briefing</button>
+</div>
+
+<!-- BOTTOM SHEETS -->
+<div class="sheet-backdrop" id="sheet-backdrop" onclick="closeAllSheets()"></div>
+
+<!-- New Task Sheet -->
+<div class="bottom-sheet" id="sheet-new-task">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">New Task</span><button class="sheet-close" onclick="closeSheet('sheet-new-task')">&times;</button></div>
+  <div class="sheet-body">
+    <div class="sheet-field"><label class="sheet-label">Title</label><input class="sheet-input" id="st-title" placeholder="What needs to be done?"></div>
+    <div class="sheet-field"><label class="sheet-label">Description</label><textarea class="sheet-textarea" id="st-desc" placeholder="Details (optional)"></textarea></div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Domain</label><select class="sheet-select" id="st-domain"><option value="legal">Legal</option><option value="financial">Financial</option><option value="operations" selected>Operations</option><option value="hr">HR</option><option value="personal">Personal</option><option value="general">General</option></select></div>
+      <div class="sheet-field"><label class="sheet-label">Priority</label><select class="sheet-select" id="st-priority"><option value="medium" selected>Medium</option><option value="critical">Critical</option><option value="high">High</option><option value="low">Low</option></select></div>
+    </div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Due Date</label><input type="date" class="sheet-input" id="st-due"></div>
+      <div class="sheet-field"><label class="sheet-label">Status</label><select class="sheet-select" id="st-status"><option value="pending" selected>Pending</option><option value="in_progress">In Progress</option><option value="completed">Completed</option><option value="blocked">Blocked</option></select></div>
+    </div>
+    <button class="sheet-submit" onclick="submitNewTask()">Create Task</button>
+  </div>
+</div>
+
+<!-- New Employee Sheet -->
+<div class="bottom-sheet" id="sheet-new-employee">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">New Employee</span><button class="sheet-close" onclick="closeSheet('sheet-new-employee')">&times;</button></div>
+  <div class="sheet-body">
+    <div class="sheet-field"><label class="sheet-label">Full Name</label><input class="sheet-input" id="se-name" placeholder="e.g. Ashley Duque"></div>
+    <div class="sheet-field"><label class="sheet-label">Role</label><input class="sheet-input" id="se-role" placeholder="e.g. Dispatcher, Office Manager"></div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Email</label><input type="email" class="sheet-input" id="se-email" placeholder="email@company.com"></div>
+      <div class="sheet-field"><label class="sheet-label">Phone</label><input type="tel" class="sheet-input" id="se-phone" placeholder="(555) 123-4567"></div>
+    </div>
+    <div class="sheet-field"><label class="sheet-label">Start Date</label><input type="date" class="sheet-input" id="se-start"></div>
+    <button class="sheet-submit" onclick="submitNewEmployee()">Add to Roster</button>
+  </div>
+</div>
+
+<!-- New Matter Sheet -->
+<div class="bottom-sheet" id="sheet-new-matter">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">New Legal Matter</span><button class="sheet-close" onclick="closeSheet('sheet-new-matter')">&times;</button></div>
+  <div class="sheet-body">
+    <div class="sheet-field"><label class="sheet-label">Case Name</label><input class="sheet-input" id="sm-case-name" placeholder="e.g. Konopko v. Cichowicz"></div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Case Type</label><select class="sheet-select" id="sm-case-type"><option value="custody">Custody</option><option value="bond_claim">Bond Claim</option><option value="contract">Contract</option><option value="employment">Employment</option><option value="regulatory">Regulatory</option><option value="other">Other</option></select></div>
+      <div class="sheet-field"><label class="sheet-label">Case Number</label><input class="sheet-input" id="sm-case-num" placeholder="e.g. 2025FA000577"></div>
+    </div>
+    <div class="sheet-field"><label class="sheet-label">Court</label><input class="sheet-input" id="sm-court" placeholder="e.g. DuPage County"></div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Attorney Name</label><input class="sheet-input" id="sm-attorney" placeholder="e.g. Mr. Wolfe"></div>
+      <div class="sheet-field"><label class="sheet-label">Opposing Counsel</label><input class="sheet-input" id="sm-opposing" placeholder="e.g. Nicole Janes"></div>
+    </div>
+    <div class="sheet-field"><label class="sheet-label">Status</label><select class="sheet-select" id="sm-status"><option value="in_progress">In Progress</option><option value="pending">Pending</option><option value="completed">Completed</option><option value="on_hold">On Hold</option></select></div>
+    <button class="sheet-submit" onclick="submitNewMatter()">Create Matter</button>
+  </div>
+</div>
+
+<!-- New Deadline Sheet -->
+<div class="bottom-sheet" id="sheet-new-deadline">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">New Deadline</span><button class="sheet-close" onclick="closeSheet('sheet-new-deadline')">&times;</button></div>
+  <div class="sheet-body">
+    <input type="hidden" id="sd-matter-id">
+    <div class="sheet-field"><label class="sheet-label">Case</label><div class="sheet-input" id="sd-matter-name" style="color:var(--teal);min-height:auto;padding:8px 14px"></div></div>
+    <div class="sheet-field"><label class="sheet-label">Title</label><input class="sheet-input" id="sd-title" placeholder="e.g. Discovery Response Due"></div>
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">Deadline Date</label><input type="date" class="sheet-input" id="sd-date"></div>
+      <div class="sheet-field"><label class="sheet-label">Priority</label><select class="sheet-select" id="sd-priority"><option value="medium" selected>Medium</option><option value="critical">Critical</option><option value="high">High</option><option value="low">Low</option></select></div>
+    </div>
+    <div class="sheet-field"><label class="sheet-label">Description</label><textarea class="sheet-textarea" id="sd-desc" placeholder="Optional details"></textarea></div>
+    <button class="sheet-submit" onclick="submitNewDeadline()">Create Deadline</button>
+  </div>
+</div>
+
+<!-- New Communication Sheet -->
+<div class="bottom-sheet" id="sheet-new-comm">
+  <div class="sheet-handle"></div>
+  <div class="sheet-header"><span class="sheet-title">Log Communication</span><button class="sheet-close" onclick="closeSheet('sheet-new-comm')">&times;</button></div>
+  <div class="sheet-body">
+    <div class="sheet-row">
+      <div class="sheet-field"><label class="sheet-label">From</label><input class="sheet-input" id="sc-from" placeholder="e.g. Nicole Janes"></div>
+      <div class="sheet-field"><label class="sheet-label">To</label><input class="sheet-input" id="sc-to" placeholder="e.g. Mr. Wolfe"></div>
+    </div>
+    <div class="sheet-field"><label class="sheet-label">Subject</label><input class="sheet-input" id="sc-subject" placeholder="e.g. Motion Response"></div>
+    <div class="sheet-field"><label class="sheet-label">Summary</label><textarea class="sheet-textarea" id="sc-summary" placeholder="Brief summary of the communication"></textarea></div>
+    <div class="sheet-field"><label class="sheet-label">Date</label><input type="date" class="sheet-input" id="sc-date"></div>
+    <div class="sheet-row">
+      <label class="sheet-check"><input type="checkbox" id="sc-copied"> Was CC'd</label>
+      <label class="sheet-check"><input type="checkbox" id="sc-flagged"> Flag this</label>
+    </div>
+    <div class="sheet-field"><label class="sheet-label">Link to Matter (optional)</label><select class="sheet-select" id="sc-matter"><option value="">No matter linked</option></select></div>
+    <button class="sheet-submit" onclick="submitNewComm()">Log Communication</button>
+  </div>
 </div>
 
 <div class="toasts" id="toasts"></div>
@@ -1419,7 +1944,7 @@ const MARTA_CONFIG = {
 // STATE
 // ================================================================
 let sb = null, user = null, isDemo = false, currentView = 'dashboard';
-const demo = { entries: [], deadlines: [], matters: [], comms: [], flags: [], insights: [] };
+const demo = { entries: [], deadlines: [], matters: [], comms: [], flags: [], insights: [], tasks: [], employees: [], onboarding: [], activityLog: [] };
 
 // ================================================================
 // BOOT
@@ -1502,7 +2027,7 @@ function enterApp() {
 // ================================================================
 // VIEW ROUTER
 // ================================================================
-var viewTitles = { dashboard: ['Dashboard','pit wall overview'], capture: ['Paddock Intake','team radio'], legal: ['Legal Tracker','cases \u00b7 deadlines \u00b7 comms'], financial: ['Financial Flags','audit \u00b7 disputes \u00b7 claims'], intel: ['Intelligence Console','analyze \u00b7 draft \u00b7 defend'] };
+var viewTitles = { dashboard: ['Dashboard','pit wall overview'], capture: ['Paddock Intake','team radio'], legal: ['Legal Tracker','cases \u00b7 deadlines \u00b7 comms'], financial: ['Financial Flags','audit \u00b7 disputes \u00b7 claims'], intel: ['Intelligence Console','analyze \u00b7 draft \u00b7 defend'], tasks: ['Tasks','manage \u00b7 track \u00b7 complete'], crew: ['Crew','team roster \u00b7 onboarding'], activity: ['Activity Feed','system log'] };
 
 document.querySelectorAll('.nav-item[data-view]').forEach(function(btn) {
   btn.addEventListener('click', function() { switchView(btn.dataset.view); });
@@ -1523,6 +2048,9 @@ function switchView(view) {
   if (view === 'capture') { loadRecentEntries(); if (intakeMode === 'radio') setTimeout(function(){ var ci = document.getElementById('capture-input'); if(ci) ci.focus(); }, 100); }
   if (view === 'legal') loadLegalData();
   if (view === 'financial') loadFinancialData();
+  if (view === 'tasks') loadTasks();
+  if (view === 'crew') loadCrew();
+  if (view === 'activity') loadActivityFeed();
 }
 
 document.querySelectorAll('.tab-btn[data-subtab]').forEach(function(btn) {
@@ -2043,12 +2571,13 @@ async function toggleResolve(id) {
 // LEGAL DATA
 // ================================================================
 async function loadLegalData() {
-  if (isDemo) { renderLegalDeadlines(demo.deadlines); renderLegalMatters(demo.matters); renderLegalComms(demo.comms); return; }
+  if (isDemo) { renderLegalDeadlines(demo.deadlines); renderLegalMatters(demo.matters); renderLegalComms(demo.comms); populateCommMatterSelect(demo.matters); return; }
   try {
     var r1 = await sb.from('legal_deadlines').select('*, legal_matters(case_name)').order('deadline_date',{ascending:true}).limit(50);
     var r2 = await sb.from('legal_matters').select('*').order('created_at',{ascending:false});
     var r3 = await sb.from('legal_communications').select('*, legal_matters(case_name)').order('communication_date',{ascending:false}).limit(50);
     renderLegalDeadlines(r1.data||[]); renderLegalMatters(r2.data||[]); renderLegalComms(r3.data||[]);
+    populateCommMatterSelect(r2.data||[]);
   } catch(e){console.error('Legal:',e);}
 }
 
@@ -2070,9 +2599,9 @@ async function toggleDeadline(id, current) {
 
 function renderLegalMatters(rows) {
   var tb = document.getElementById('legal-matters-tbody');
-  if (!rows.length) { tb.innerHTML = '<tr><td colspan="5"><div class="panel-empty"><p>No cases</p></div></td></tr>'; return; }
+  if (!rows.length) { tb.innerHTML = '<tr><td colspan="6"><div class="panel-empty"><p>No cases</p></div></td></tr>'; return; }
   tb.innerHTML = rows.map(function(m) {
-    return '<tr><td>'+esc(m.case_name)+'</td><td class="mono">'+(m.case_type||'').replace(/_/g,' ')+'</td><td>'+esc(m.court||'\u2014')+'</td><td>'+esc(m.attorney_name||'\u2014')+'</td><td><span class="status-badge '+(m.status||'')+'">'+(m.status||'').replace(/_/g,' ')+'</span></td></tr>';
+    return '<tr><td>'+esc(m.case_name)+'</td><td class="mono">'+(m.case_type||'').replace(/_/g,' ')+'</td><td>'+esc(m.court||'\u2014')+'</td><td>'+esc(m.attorney_name||'\u2014')+'</td><td><span class="status-badge '+(m.status||'')+'">'+(m.status||'').replace(/_/g,' ')+'</span></td><td><div class="matter-row-actions"><button class="row-action-btn" onclick="event.stopPropagation();openDeadlineSheet(\''+m.id+'\',\''+esc(m.case_name)+'\')">+ Deadline</button><button class="row-action-btn" onclick="event.stopPropagation();openCommSheetForMatter(\''+m.id+'\',\''+esc(m.case_name)+'\')">+ Comm</button></div></td></tr>';
   }).join('');
 }
 
@@ -2126,6 +2655,8 @@ async function resolveFlag(id) {
 // RACE ENGINEERING BRIEFINGS (AI Insights)
 // ================================================================
 var insightsOpen = false;
+var briefingTab = 'unread';
+
 function toggleInsights() {
   insightsOpen = !insightsOpen;
   document.getElementById('insights-panel').classList.toggle('open', insightsOpen);
@@ -2133,19 +2664,56 @@ function toggleInsights() {
   if (insightsOpen) loadInsights();
 }
 
-async function loadInsights() {
-  var el = document.getElementById('insights-list');
-  if (isDemo) { renderInsightCards(demo.insights); return; }
-  try { var r = await sb.from('ai_insights').select('*').eq('acknowledged',false).order('created_at',{ascending:false}).limit(20); renderInsightCards(r.data||[]); }
-  catch(e){ el.innerHTML = '<div class="panel-empty"><p>Error loading briefings.</p></div>'; }
+function switchBriefingTab(tab) {
+  briefingTab = tab;
+  document.getElementById('tab-unread').classList.toggle('active', tab === 'unread');
+  document.getElementById('tab-history').classList.toggle('active', tab === 'history');
+  loadInsights();
 }
 
-function renderInsightCards(insights) {
+async function loadInsights() {
   var el = document.getElementById('insights-list');
-  if (!insights.length) { el.innerHTML = '<div class="panel-empty" style="padding:60px 20px"><div class="empty-icon">&#9880;</div><p>No unread briefings. Request one below.</p></div>'; return; }
+  if (isDemo) {
+    var list = briefingTab === 'unread' ? demo.insights.filter(function(i){return !i.acknowledged;}) : demo.insights.filter(function(i){return i.acknowledged;});
+    renderInsightCards(list, briefingTab === 'history');
+    return;
+  }
+  try {
+    var q = sb.from('ai_insights').select('*').order('created_at',{ascending:false}).limit(30);
+    if (briefingTab === 'unread') q = q.eq('acknowledged', false);
+    else q = q.eq('acknowledged', true);
+    var r = await q;
+    renderInsightCards(r.data||[], briefingTab === 'history');
+  } catch(e){ el.innerHTML = '<div class="panel-empty"><p>Error loading briefings.</p></div>'; }
+}
+
+function renderInsightCards(insights, isPast) {
+  var el = document.getElementById('insights-list');
+  var emptyMsg = isPast ? 'No past briefings yet.' : 'No unread briefings. Request one below.';
+  if (!insights.length) { el.innerHTML = '<div class="panel-empty" style="padding:60px 20px"><div class="empty-icon">&#9880;</div><p>' + emptyMsg + '</p></div>'; return; }
+  var typeIcons = {deadline_warning:'\u23f0',pattern:'\ud83d\udcca',suggestion:'\ud83d\udca1',anomaly:'\u26a0'};
+  var domainLabels = {legal:'\u2696 Legal',financial:'$ Financial',operations:'\u25c8 Ops',hr:'\u25c9 HR',personal:'\u2666 Personal',general:'\u2726 General'};
   el.innerHTML = insights.map(function(i) {
-    var typeIcons = {deadline_warning:'\u23f0',pattern:'\ud83d\udcca',suggestion:'\ud83d\udca1',anomaly:'\u26a0'};
-    return '<div class="insight-card" id="insight-'+i.id+'" onclick="highlightInsight(\''+i.id+'\')"><div class="insight-type-label '+(i.insight_type||'suggestion')+'">'+(typeIcons[i.insight_type]||'\u2726')+' '+(i.insight_type||'suggestion').replace(/_/g,' ')+(i.severity==='critical'?' \u00b7 <span style="color:var(--red)">RED FLAG</span>':'')+'</div><div class="insight-content">'+esc(i.content||i.title)+'</div><div class="insight-footer"><span class="insight-time">'+timeAgo(i.created_at)+'</span><button class="insight-ack" onclick="event.stopPropagation();ackInsight(\''+i.id+'\')">\u2713 Copy</button></div></div>';
+    var sev = i.severity || 'medium';
+    var type = i.insight_type || 'suggestion';
+    var domain = i.domain || 'general';
+    var h = '<div class="insight-card sev-' + sev + (isPast ? ' past' : '') + '" id="insight-' + i.id + '" onclick="highlightInsight(\'' + i.id + '\')">';
+    h += '<div class="insight-top-row">';
+    h += '<div class="insight-type-label ' + type + '">' + (typeIcons[type]||'\u2726') + ' ' + type.replace(/_/g,' ');
+    if (sev === 'critical') h += ' \u00b7 <span style="color:var(--red)">RED FLAG</span>';
+    h += '</div>';
+    h += '<div style="display:flex;gap:5px;align-items:center">';
+    h += '<span class="insight-domain-tag ' + domain + '">' + (domainLabels[domain]||domain) + '</span>';
+    h += '<span class="insight-severity-badge ' + sev + '">' + sev + '</span>';
+    h += '</div></div>';
+    if (i.title && i.title !== type.replace(/_/g,' ')) h += '<div class="insight-title">' + esc(i.title) + '</div>';
+    h += '<div class="insight-content">' + esc(i.content || '') + '</div>';
+    h += '<div class="insight-footer"><span class="insight-time">' + timeAgo(i.created_at) + '</span>';
+    h += '<div class="insight-actions">';
+    h += '<button class="insight-btn copy-btn" onclick="event.stopPropagation();copyInsight(\'' + i.id + '\')" title="Copy to clipboard">\ud83d\udccb Copy</button>';
+    if (!isPast) h += '<button class="insight-btn ack-btn" onclick="event.stopPropagation();ackInsight(\'' + i.id + '\')" title="Acknowledge &amp; archive">\u2713 Ack</button>';
+    h += '</div></div></div>';
+    return h;
   }).join('');
 }
 
@@ -2155,34 +2723,58 @@ function highlightInsight(id) {
   if (card) card.classList.add('highlighted');
 }
 
+function copyInsight(id) {
+  var card = document.getElementById('insight-'+id);
+  if (!card) return;
+  var title = card.querySelector('.insight-title');
+  var content = card.querySelector('.insight-content');
+  var text = (title ? title.textContent + '\n' : '') + (content ? content.textContent : '');
+  navigator.clipboard.writeText(text).then(function(){toast('Copied to clipboard','success');}).catch(function(){toast('Copy failed','error');});
+}
+
 async function ackInsight(id) {
-  if (isDemo) { demo.insights = demo.insights.filter(function(i){return i.id!==id;}); renderInsightCards(demo.insights); loadDashboard(); toast('Briefing acknowledged','success'); return; }
+  if (isDemo) {
+    var item = demo.insights.find(function(i){return i.id===id;});
+    if (item) { item.acknowledged = true; item.acknowledged_at = new Date().toISOString(); }
+    loadInsights(); loadDashboard(); toast('Briefing archived','success'); return;
+  }
   await sb.from('ai_insights').update({acknowledged:true,acknowledged_at:new Date().toISOString()}).eq('id',id);
-  loadInsights(); loadDashboard(); toast('Briefing acknowledged','success');
+  loadInsights(); loadDashboard(); toast('Briefing archived','success');
 }
 
 async function generateInsight() {
+  var btn = document.getElementById('insights-gen-btn');
+  var spinner = document.getElementById('gen-spinner');
+  btn.disabled = true; spinner.style.display = 'inline-block';
+
   if (isDemo) {
     var pool = [
-      {type:'deadline_warning',severity:'high',content:'No legal entries in 4 days. Your hearing on Case 2025FA000577 is approaching \u2014 review prep with Mr. Wolfe.'},
-      {type:'pattern',severity:'medium',content:'Financial flags spiked 60% this week: 3 new duplicate payment findings all trace to Monday TMS batch export.'},
-      {type:'anomaly',severity:'critical',content:'Nicole Janes sent a motion response to Wolfe without CC\'ing you \u2014 3rd occurrence. Document for hearing.'},
-      {type:'suggestion',severity:'medium',content:'Kaleesi\'s Primrose enrollment was logged 12 days ago with no GAL follow-up. Send transparency report to Hudzik.'},
-      {type:'suggestion',severity:'low',content:'Alpha Baking rate review is Tuesday. 2 temperature deviations logged for that account \u2014 prepare mitigation data.'},
-      {type:'pattern',severity:'high',content:'2 new bond claims in 10 days from the same carrier. Check cumulative exposure against surety limits.'},
+      {type:'deadline_warning',severity:'high',domain:'legal',title:'Hearing Prep Gap',content:'No legal entries in 4 days. Your hearing on Case 2025FA000577 is approaching \u2014 review prep with Mr. Wolfe.'},
+      {type:'pattern',severity:'medium',domain:'financial',title:'TMS Batch Export Issue',content:'Financial flags spiked 60% this week: 3 new duplicate payment findings all trace to Monday TMS batch export.'},
+      {type:'anomaly',severity:'critical',domain:'legal',title:'CC Violation \u2014 Janes Protocol',content:'Nicole Janes sent a motion response to Wolfe without CC\'ing you \u2014 3rd occurrence. Document for hearing.'},
+      {type:'suggestion',severity:'medium',domain:'personal',title:'GAL Follow-up Overdue',content:'Kaleesi\'s Primrose enrollment was logged 12 days ago with no GAL follow-up. Send transparency report to Hudzik.'},
+      {type:'suggestion',severity:'low',domain:'operations',title:'Alpha Baking Rate Review',content:'Alpha Baking rate review is Tuesday. 2 temperature deviations logged for that account \u2014 prepare mitigation data.'},
+      {type:'pattern',severity:'high',domain:'financial',title:'Surety Exposure Spike',content:'2 new bond claims in 10 days from the same carrier. Check cumulative exposure against surety limits.'},
     ];
     var pick = pool[Math.floor(Math.random()*pool.length)];
-    demo.insights.unshift({id:crypto.randomUUID(),insight_type:pick.type,title:pick.type.replace(/_/g,' '),content:pick.content,severity:pick.severity,acknowledged:false,created_at:new Date().toISOString()});
-    renderInsightCards(demo.insights); loadDashboard(); toast('Briefing received','info'); return;
+    demo.insights.unshift({id:crypto.randomUUID(),insight_type:pick.type,title:pick.title,content:pick.content,severity:pick.severity,domain:pick.domain,acknowledged:false,created_at:new Date().toISOString()});
+    if (briefingTab !== 'unread') switchBriefingTab('unread');
+    else loadInsights();
+    loadDashboard(); toast('Briefing received','info');
+    btn.disabled = false; spinner.style.display = 'none';
+    return;
   }
-  if (!MARTA_CONFIG.EDGE_FN_URL) { toast('Edge Function URL not configured','error'); return; }
-  toast('Requesting briefing...','info');
+  if (!MARTA_CONFIG.EDGE_FN_URL) { toast('Edge Function URL not configured','error'); btn.disabled = false; spinner.style.display = 'none'; return; }
   try {
     var sess = await sb.auth.getSession();
-    var res = await fetch(MARTA_CONFIG.EDGE_FN_URL, {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+sess.data.session.access_token,'apikey':MARTA_CONFIG.SUPABASE_ANON_KEY},body:JSON.stringify({action:'generate_insight'})});
+    var token = (sess && sess.data && sess.data.session) ? sess.data.session.access_token : MARTA_CONFIG.SUPABASE_ANON_KEY;
+    var res = await fetch(MARTA_CONFIG.EDGE_FN_URL, {method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token,'apikey':MARTA_CONFIG.SUPABASE_ANON_KEY},body:JSON.stringify({action:'generate_insight'})});
     if (!res.ok) throw new Error('Edge function error '+res.status);
-    toast('Briefing received','success'); loadInsights(); loadDashboard();
+    if (briefingTab !== 'unread') switchBriefingTab('unread');
+    else loadInsights();
+    loadDashboard(); toast('Briefing received','success');
   } catch(e){ toast('Engineering error: '+e.message,'error'); }
+  finally { btn.disabled = false; spinner.style.display = 'none'; }
 }
 
 // ================================================================
@@ -2252,8 +2844,8 @@ async function runIntelAnalysis() {
 
   try {
     var sess = isDemo ? null : await sb.auth.getSession();
-    var headers = { 'Content-Type': 'application/json', 'apikey': MARTA_CONFIG.SUPABASE_ANON_KEY };
-    if (sess && sess.data && sess.data.session) headers['Authorization'] = 'Bearer ' + sess.data.session.access_token;
+    var token = (sess && sess.data && sess.data.session) ? sess.data.session.access_token : MARTA_CONFIG.SUPABASE_ANON_KEY;
+    var headers = { 'Content-Type': 'application/json', 'apikey': MARTA_CONFIG.SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + token };
 
     var res = await fetch(MARTA_CONFIG.ANALYZE_URL, {
       method: 'POST', headers: headers, body: JSON.stringify(payload)
@@ -2438,16 +3030,423 @@ function copyDraft(el) {
 }
 
 // ================================================================
+// BOTTOM SHEET CONTROLLER
+// ================================================================
+function openSheet(id) {
+  document.getElementById('sheet-backdrop').classList.add('open');
+  document.getElementById(id).classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+function closeSheet(id) {
+  document.getElementById(id).classList.remove('open');
+  document.getElementById('sheet-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeAllSheets() {
+  document.querySelectorAll('.bottom-sheet.open').forEach(function(s) { s.classList.remove('open'); });
+  document.getElementById('sheet-backdrop').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+// ================================================================
+// TASKS VIEW
+// ================================================================
+async function loadTasks() {
+  var el = document.getElementById('tasks-list');
+  if (isDemo) { renderTasks(demo.tasks); return; }
+  try {
+    var r = await sb.from('tasks').select('*').order('created_at', { ascending: false });
+    renderTasks(r.data || []);
+  } catch (e) { el.innerHTML = '<div class="panel-empty"><p>Error loading tasks.</p></div>'; console.error('Tasks:', e); }
+}
+
+function renderTasks(tasks) {
+  var el = document.getElementById('tasks-list');
+  if (!tasks.length) { el.innerHTML = '<div class="panel-empty"><div class="empty-icon">&#128203;</div><p>No tasks yet. Create one above.</p></div>'; return; }
+  el.innerHTML = tasks.map(function(t) {
+    var isComplete = t.status === 'completed';
+    var dueStr = '';
+    var dueClass = '';
+    if (t.due_date) {
+      var dd = new Date(t.due_date);
+      var days = Math.ceil((dd - new Date()) / 86400000);
+      dueStr = dd.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      if (days < 0 && !isComplete) { dueStr += ' (overdue)'; dueClass = ' overdue'; }
+      else if (days <= 2 && !isComplete) { dueClass = ' overdue'; }
+    }
+    var links = '';
+    if (t.linked_entry_id) links += '<span class="task-link-chip" onclick="event.stopPropagation();switchView(\'capture\')">&#128279; entry</span>';
+    if (t.linked_matter_id) links += '<span class="task-link-chip" onclick="event.stopPropagation();switchView(\'legal\')">&#128279; matter</span>';
+    if (t.linked_flag_id) links += '<span class="task-link-chip" onclick="event.stopPropagation();switchView(\'financial\')">&#128279; flag</span>';
+    var h = '<div class="task-card ' + (isComplete ? 'completed' : '') + '">';
+    h += '<div class="task-top"><span class="domain-dot ' + (t.domain || 'general') + '"></span><span class="task-title">' + esc(t.title) + '</span></div>';
+    h += '<div class="task-meta">';
+    h += '<span class="status-badge ' + (t.status || '') + '">' + (t.status || 'pending').replace(/_/g, ' ') + '</span>';
+    h += '<span class="priority-pip ' + (t.priority || 'medium') + '">' + (t.priority || 'medium') + '</span>';
+    if (dueStr) h += '<span class="task-due' + dueClass + '">' + dueStr + '</span>';
+    h += links;
+    h += '</div>';
+    h += '<div class="task-actions">';
+    if (!isComplete) h += '<button class="task-action-btn complete-btn" onclick="markTaskComplete(\'' + t.id + '\')">&#10003; Complete</button>';
+    h += '<button class="task-action-btn delete-btn" onclick="deleteTask(\'' + t.id + '\')">&#10005; Delete</button>';
+    h += '</div></div>';
+    return h;
+  }).join('');
+}
+
+async function markTaskComplete(id) {
+  if (isDemo) {
+    var t = demo.tasks.find(function(x) { return x.id === id; });
+    if (t) { t.status = 'completed'; }
+    loadTasks(); toast('Task completed', 'success'); return;
+  }
+  try {
+    await sb.from('tasks').update({ status: 'completed' }).eq('id', id);
+    loadTasks(); toast('Task completed', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function deleteTask(id) {
+  if (!confirm('Delete this task?')) return;
+  if (isDemo) {
+    demo.tasks = demo.tasks.filter(function(x) { return x.id !== id; });
+    loadTasks(); toast('Task deleted', 'success'); return;
+  }
+  try {
+    await sb.from('tasks').delete().eq('id', id);
+    loadTasks(); toast('Task deleted', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function submitNewTask() {
+  var title = document.getElementById('st-title').value.trim();
+  if (!title) { toast('Title is required', 'error'); return; }
+  var task = {
+    title: title,
+    description: document.getElementById('st-desc').value.trim() || null,
+    domain: document.getElementById('st-domain').value,
+    priority: document.getElementById('st-priority').value,
+    due_date: document.getElementById('st-due').value || null,
+    status: document.getElementById('st-status').value,
+  };
+  if (isDemo) {
+    task.id = crypto.randomUUID();
+    task.created_at = new Date().toISOString();
+    demo.tasks.unshift(task);
+    closeSheet('sheet-new-task');
+    document.getElementById('st-title').value = '';
+    document.getElementById('st-desc').value = '';
+    document.getElementById('st-due').value = '';
+    loadTasks(); toast('Task created', 'success'); return;
+  }
+  try {
+    task.user_id = user.id;
+    var r = await sb.from('tasks').insert(task);
+    if (r.error) throw r.error;
+    closeSheet('sheet-new-task');
+    document.getElementById('st-title').value = '';
+    document.getElementById('st-desc').value = '';
+    document.getElementById('st-due').value = '';
+    loadTasks(); toast('Task created', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ================================================================
+// CREW VIEW
+// ================================================================
+async function loadCrew() {
+  var el = document.getElementById('crew-list');
+  if (isDemo) { renderCrew(demo.employees); return; }
+  try {
+    var r = await sb.from('employees').select('*').order('full_name');
+    renderCrew(r.data || []);
+  } catch (e) { el.innerHTML = '<div class="panel-empty"><p>Error loading crew.</p></div>'; console.error('Crew:', e); }
+}
+
+function renderCrew(employees) {
+  var el = document.getElementById('crew-list');
+  if (!employees.length) { el.innerHTML = '<div class="panel-empty"><div class="empty-icon">&#128101;</div><p>No crew members. Add one above.</p></div>'; return; }
+  el.innerHTML = employees.map(function(e) {
+    var initials = (e.full_name || 'U').split(' ').map(function(w) { return w[0]; }).join('').substring(0, 2).toUpperCase();
+    var startStr = e.start_date ? new Date(e.start_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '';
+    var active = e.is_active !== false;
+    var h = '<div class="crew-card ' + (active ? '' : 'inactive') + '" onclick="toggleCrewExpand(\'' + e.id + '\')">';
+    h += '<div class="crew-top"><div class="crew-avatar">' + initials + '</div><div><div class="crew-name">' + esc(e.full_name) + '</div><div class="crew-role">' + esc(e.role || '\u2014') + '</div></div></div>';
+    h += '<div class="crew-meta">';
+    h += '<span class="crew-status-badge ' + (active ? 'active' : 'inactive-badge') + '">' + (active ? 'Active' : 'Inactive') + '</span>';
+    if (startStr) h += '<span class="crew-start">Started: ' + startStr + '</span>';
+    h += '<button class="crew-toggle-btn" onclick="event.stopPropagation();toggleCrewActive(\'' + e.id + '\',' + active + ')">' + (active ? 'Deactivate' : 'Activate') + '</button>';
+    h += '</div>';
+    h += '<div class="crew-expand" id="crew-expand-' + e.id + '"><div class="onboard-label">Onboarding Checklist</div><div class="onboard-list" id="onboard-' + e.id + '"><div class="panel-loading"><div class="spinner-sm"></div></div></div></div>';
+    h += '</div>';
+    return h;
+  }).join('');
+}
+
+function toggleCrewExpand(id) {
+  var el = document.getElementById('crew-expand-' + id);
+  if (!el) return;
+  var isOpen = el.classList.contains('open');
+  document.querySelectorAll('.crew-expand.open').forEach(function(e) { e.classList.remove('open'); });
+  if (!isOpen) {
+    el.classList.add('open');
+    loadOnboardingTasks(id);
+  }
+}
+
+async function loadOnboardingTasks(empId) {
+  var el = document.getElementById('onboard-' + empId);
+  if (!el) return;
+  if (isDemo) {
+    var tasks = demo.onboarding.filter(function(t) { return t.employee_id === empId; });
+    renderOnboarding(el, tasks);
+    return;
+  }
+  try {
+    var r = await sb.from('onboarding_tasks').select('*').eq('employee_id', empId).order('created_at');
+    renderOnboarding(el, r.data || []);
+  } catch (e) { el.innerHTML = '<div style="padding:8px;font-size:0.78rem;color:var(--carbon-500)">No onboarding tasks found.</div>'; }
+}
+
+function renderOnboarding(el, tasks) {
+  if (!tasks.length) { el.innerHTML = '<div style="padding:8px;font-size:0.78rem;color:var(--carbon-500)">No onboarding tasks.</div>'; return; }
+  el.innerHTML = tasks.map(function(t) {
+    return '<div class="onboard-item ' + (t.completed ? 'done' : '') + '"><input type="checkbox" class="onboard-check" ' + (t.completed ? 'checked' : '') + ' onchange="toggleOnboard(\'' + t.id + '\',this.checked)"><span>' + esc(t.task_name || t.title || '') + '</span></div>';
+  }).join('');
+}
+
+async function toggleOnboard(id, checked) {
+  if (isDemo) {
+    var t = demo.onboarding.find(function(x) { return x.id === id; });
+    if (t) t.completed = checked;
+    return;
+  }
+  try { await sb.from('onboarding_tasks').update({ completed: checked }).eq('id', id); } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function toggleCrewActive(id, current) {
+  if (isDemo) {
+    var e = demo.employees.find(function(x) { return x.id === id; });
+    if (e) e.is_active = !current;
+    loadCrew(); toast(current ? 'Deactivated' : 'Activated', 'success'); return;
+  }
+  try {
+    await sb.from('employees').update({ is_active: !current }).eq('id', id);
+    loadCrew(); toast(current ? 'Deactivated' : 'Activated', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+async function submitNewEmployee() {
+  var name = document.getElementById('se-name').value.trim();
+  if (!name) { toast('Name is required', 'error'); return; }
+  var emp = {
+    full_name: name,
+    role: document.getElementById('se-role').value.trim() || null,
+    email: document.getElementById('se-email').value.trim() || null,
+    phone: document.getElementById('se-phone').value.trim() || null,
+    start_date: document.getElementById('se-start').value || null,
+    is_active: true,
+  };
+  if (isDemo) {
+    emp.id = crypto.randomUUID();
+    emp.created_at = new Date().toISOString();
+    demo.employees.push(emp);
+    closeSheet('sheet-new-employee');
+    document.getElementById('se-name').value = '';
+    document.getElementById('se-role').value = '';
+    document.getElementById('se-email').value = '';
+    document.getElementById('se-phone').value = '';
+    document.getElementById('se-start').value = '';
+    loadCrew(); toast('Employee added', 'success'); return;
+  }
+  try {
+    emp.user_id = user.id;
+    var r = await sb.from('employees').insert(emp);
+    if (r.error) throw r.error;
+    closeSheet('sheet-new-employee');
+    document.getElementById('se-name').value = '';
+    document.getElementById('se-role').value = '';
+    document.getElementById('se-email').value = '';
+    document.getElementById('se-phone').value = '';
+    document.getElementById('se-start').value = '';
+    loadCrew(); toast('Employee added', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+// ================================================================
+// ACTIVITY FEED VIEW
+// ================================================================
+async function loadActivityFeed() {
+  var el = document.getElementById('activity-list');
+  if (isDemo) { renderActivityFeed(demo.activityLog); return; }
+  try {
+    var r = await sb.from('activity_log').select('*').order('created_at', { ascending: false }).limit(100);
+    renderActivityFeed(r.data || []);
+  } catch (e) { el.innerHTML = '<div class="panel-empty"><p>Error loading activity log.</p></div>'; console.error('Activity:', e); }
+}
+
+function renderActivityFeed(logs) {
+  var el = document.getElementById('activity-list');
+  if (!logs.length) { el.innerHTML = '<div class="panel-empty"><div class="empty-icon">&#128220;</div><p>No activity recorded yet.</p></div>'; return; }
+  el.innerHTML = logs.map(function(l) {
+    var action = (l.action || 'unknown').toUpperCase();
+    var actionClass = action === 'INSERT' ? 'insert' : action === 'UPDATE' ? 'update' : action === 'DELETE' ? 'delete' : '';
+    var tbl = l.table_name || 'unknown';
+    var ts = timeAgo(l.created_at);
+    var rid = l.record_id ? (l.record_id.substring(0, 8) + '...') : '\u2014';
+    return '<div class="feed-item" data-tbl="' + esc(tbl) + '"><span class="feed-action ' + actionClass + '">' + action + '</span><span class="feed-table">' + esc(tbl.replace(/_/g, ' ')) + '</span><span class="feed-id">' + rid + '</span><span class="feed-time">' + ts + '</span></div>';
+  }).join('');
+}
+
+// ================================================================
+// LEGAL — NEW MATTER / DEADLINE / COMMUNICATION SUBMISSIONS
+// ================================================================
+async function submitNewMatter() {
+  var caseName = document.getElementById('sm-case-name').value.trim();
+  if (!caseName) { toast('Case name is required', 'error'); return; }
+  var matter = {
+    case_name: caseName,
+    case_type: document.getElementById('sm-case-type').value,
+    case_number: document.getElementById('sm-case-num').value.trim() || null,
+    court: document.getElementById('sm-court').value.trim() || null,
+    attorney_name: document.getElementById('sm-attorney').value.trim() || null,
+    opposing_counsel: document.getElementById('sm-opposing').value.trim() || null,
+    status: document.getElementById('sm-status').value,
+  };
+  if (isDemo) {
+    matter.id = crypto.randomUUID();
+    matter.created_at = new Date().toISOString();
+    demo.matters.push(matter);
+    closeSheet('sheet-new-matter');
+    clearSheetInputs('sm-');
+    loadLegalData(); toast('Matter created', 'success'); return;
+  }
+  try {
+    matter.user_id = user.id;
+    var r = await sb.from('legal_matters').insert(matter);
+    if (r.error) throw r.error;
+    closeSheet('sheet-new-matter');
+    clearSheetInputs('sm-');
+    loadLegalData(); toast('Matter created', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+function openDeadlineSheet(matterId, caseName) {
+  document.getElementById('sd-matter-id').value = matterId;
+  document.getElementById('sd-matter-name').textContent = caseName;
+  openSheet('sheet-new-deadline');
+}
+
+async function submitNewDeadline() {
+  var title = document.getElementById('sd-title').value.trim();
+  var date = document.getElementById('sd-date').value;
+  if (!title || !date) { toast('Title and date are required', 'error'); return; }
+  var deadline = {
+    matter_id: document.getElementById('sd-matter-id').value || null,
+    title: title,
+    deadline_date: date,
+    priority: document.getElementById('sd-priority').value,
+    description: document.getElementById('sd-desc').value.trim() || null,
+    completed: false,
+  };
+  if (isDemo) {
+    deadline.id = crypto.randomUUID();
+    deadline.created_at = new Date().toISOString();
+    var matter = demo.matters.find(function(m) { return m.id === deadline.matter_id; });
+    deadline.legal_matters = matter ? { case_name: matter.case_name } : { case_name: '\u2014' };
+    demo.deadlines.push(deadline);
+    closeSheet('sheet-new-deadline');
+    clearSheetInputs('sd-');
+    loadLegalData(); loadDashboard(); toast('Deadline created', 'success'); return;
+  }
+  try {
+    deadline.user_id = user.id;
+    var r = await sb.from('legal_deadlines').insert(deadline);
+    if (r.error) throw r.error;
+    closeSheet('sheet-new-deadline');
+    clearSheetInputs('sd-');
+    loadLegalData(); loadDashboard(); toast('Deadline created', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+function openCommSheetForMatter(matterId, caseName) {
+  var sel = document.getElementById('sc-matter');
+  // Pre-select the matter if it's in the dropdown
+  for (var i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value === matterId) { sel.selectedIndex = i; break; }
+  }
+  openSheet('sheet-new-comm');
+}
+
+async function submitNewComm() {
+  var from = document.getElementById('sc-from').value.trim();
+  var to = document.getElementById('sc-to').value.trim();
+  if (!from || !to) { toast('From and To are required', 'error'); return; }
+  var comm = {
+    from_party: from,
+    to_party: to,
+    subject: document.getElementById('sc-subject').value.trim() || null,
+    summary: document.getElementById('sc-summary').value.trim() || null,
+    communication_date: document.getElementById('sc-date').value || new Date().toISOString().split('T')[0],
+    was_copied: document.getElementById('sc-copied').checked,
+    flagged: document.getElementById('sc-flagged').checked,
+    matter_id: document.getElementById('sc-matter').value || null,
+  };
+  if (isDemo) {
+    comm.id = crypto.randomUUID();
+    demo.comms.unshift(comm);
+    closeSheet('sheet-new-comm');
+    clearSheetInputs('sc-');
+    document.getElementById('sc-copied').checked = false;
+    document.getElementById('sc-flagged').checked = false;
+    loadLegalData(); toast('Communication logged', 'success'); return;
+  }
+  try {
+    comm.user_id = user.id;
+    var r = await sb.from('legal_communications').insert(comm);
+    if (r.error) throw r.error;
+    closeSheet('sheet-new-comm');
+    clearSheetInputs('sc-');
+    document.getElementById('sc-copied').checked = false;
+    document.getElementById('sc-flagged').checked = false;
+    loadLegalData(); toast('Communication logged', 'success');
+  } catch (e) { toast('Error: ' + e.message, 'error'); }
+}
+
+function clearSheetInputs(prefix) {
+  document.querySelectorAll('[id^="' + prefix + '"]').forEach(function(el) {
+    if (el.tagName === 'INPUT' && el.type !== 'hidden') el.value = '';
+    if (el.tagName === 'TEXTAREA') el.value = '';
+  });
+}
+
+// Populate comm sheet matter dropdown when legal data loads
+function populateCommMatterSelect(matters) {
+  var sel = document.getElementById('sc-matter');
+  if (!sel) return;
+  var val = sel.value;
+  sel.innerHTML = '<option value="">No matter linked</option>';
+  matters.forEach(function(m) {
+    sel.innerHTML += '<option value="' + m.id + '">' + esc(m.case_name) + '</option>';
+  });
+  sel.value = val;
+}
+
+// ================================================================
 // REALTIME
 // ================================================================
 function subscribeRealtime() {
   if (isDemo || !sb) return;
   sb.channel('kono-live')
     .on('postgres_changes',{event:'*',schema:'public',table:'entries'},function(){if(currentView==='dashboard')loadDashboard();if(currentView==='capture')loadRecentEntries();})
-    .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},function(){if(currentView==='dashboard')loadDashboard();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'tasks'},function(){if(currentView==='dashboard')loadDashboard();if(currentView==='tasks')loadTasks();})
     .on('postgres_changes',{event:'*',schema:'public',table:'ai_insights'},function(){loadInsights();if(currentView==='dashboard')loadDashboard();})
     .on('postgres_changes',{event:'*',schema:'public',table:'financial_flags'},function(){if(currentView==='financial')loadFinancialData();if(currentView==='dashboard')loadDashboard();})
     .on('postgres_changes',{event:'*',schema:'public',table:'legal_deadlines'},function(){if(currentView==='legal')loadLegalData();if(currentView==='dashboard')loadDashboard();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'employees'},function(){if(currentView==='crew')loadCrew();if(currentView==='dashboard')loadDashboard();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'activity_log'},function(){if(currentView==='activity')loadActivityFeed();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'legal_matters'},function(){if(currentView==='legal')loadLegalData();})
+    .on('postgres_changes',{event:'*',schema:'public',table:'legal_communications'},function(){if(currentView==='legal')loadLegalData();})
     .subscribe();
 }
 
@@ -2492,6 +3491,53 @@ function seedDemoData() {
     {id:crypto.randomUUID(),flag_type:'duplicate_payment',title:'Vendor #3891 \u2014 Load LR-8822',vendor:'Express Haul Inc',amount:1450,source_system:'quickbooks',status:'completed',resolved_at:new Date(now-H*100).toISOString(),resolution_notes:'Duplicate confirmed. ACH reversal initiated.'},
   ];
   demo.insights = [];
+
+  // Tasks
+  demo.tasks = [
+    {id:crypto.randomUUID(),title:'Review and send discovery response to Wolfe',description:'Full Olechno case file review needed',domain:'legal',priority:'critical',status:'pending',due_date:new Date(now+H*20).toISOString().split('T')[0],linked_entry_id:'x',created_at:new Date(now-H*2).toISOString()},
+    {id:crypto.randomUUID(),title:'Pull POD docs for Zurich bond claim',description:'MC-892441 damage claim — need POD and rate confirmation',domain:'financial',priority:'high',status:'in_progress',due_date:new Date(now+H*48).toISOString().split('T')[0],linked_flag_id:'x',created_at:new Date(now-H*6).toISOString()},
+    {id:crypto.randomUUID(),title:'Prep Alpha Baking rate comparison',description:'90-day volume data for Tuesday meeting',domain:'operations',priority:'medium',status:'pending',due_date:new Date(now+H*72).toISOString().split('T')[0],created_at:new Date(now-H*12).toISOString()},
+    {id:crypto.randomUUID(),title:'Complete Ashley Duque direct deposit setup',description:'W-4 and I-9 received. Direct deposit pending.',domain:'hr',priority:'medium',status:'pending',due_date:new Date(now+H*120).toISOString().split('T')[0],created_at:new Date(now-H*8).toISOString()},
+    {id:crypto.randomUUID(),title:'Send GAL transparency report to Hudzik',description:'Kaleesi Primrose enrollment follow-up',domain:'personal',priority:'high',status:'pending',due_date:new Date(now+H*48).toISOString().split('T')[0],linked_matter_id:'x',created_at:new Date(now-H*24).toISOString()},
+    {id:crypto.randomUUID(),title:'ACH reversal for Vendor #3891',description:'Duplicate confirmed on load LR-8822',domain:'financial',priority:'low',status:'completed',due_date:new Date(now-H*48).toISOString().split('T')[0],created_at:new Date(now-H*96).toISOString()},
+  ];
+
+  // Employees
+  var empIds = [crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID(), crypto.randomUUID()];
+  demo.employees = [
+    {id:empIds[0],full_name:'Ashley Duque',role:'Office Manager',email:'ashley@uscb.com',phone:'(630) 555-0101',is_active:true,start_date:'2024-11-15',created_at:new Date(now-H*2000).toISOString()},
+    {id:empIds[1],full_name:'Robbie Stover',role:'Dispatcher',email:'robbie@uscb.com',phone:'(630) 555-0102',is_active:true,start_date:'2024-06-01',created_at:new Date(now-H*5000).toISOString()},
+    {id:empIds[2],full_name:'Connor Braschler',role:'Carrier Sales',email:'connor@uscb.com',phone:'(630) 555-0103',is_active:true,start_date:'2024-09-15',created_at:new Date(now-H*3000).toISOString()},
+    {id:empIds[3],full_name:'Dominick Drilinga',role:'Auditor (Contract)',email:'dom@uscb.com',phone:null,is_active:false,start_date:'2024-03-01',created_at:new Date(now-H*7000).toISOString()},
+  ];
+
+  // Onboarding tasks
+  demo.onboarding = [
+    {id:crypto.randomUUID(),employee_id:empIds[0],task_name:'W-4 Form Submitted',completed:true},
+    {id:crypto.randomUUID(),employee_id:empIds[0],task_name:'I-9 Verification',completed:true},
+    {id:crypto.randomUUID(),employee_id:empIds[0],task_name:'Direct Deposit Setup',completed:false},
+    {id:crypto.randomUUID(),employee_id:empIds[0],task_name:'NDA Signed',completed:true},
+    {id:crypto.randomUUID(),employee_id:empIds[0],task_name:'TMS Training',completed:false},
+    {id:crypto.randomUUID(),employee_id:empIds[1],task_name:'W-4 Form Submitted',completed:true},
+    {id:crypto.randomUUID(),employee_id:empIds[1],task_name:'I-9 Verification',completed:true},
+    {id:crypto.randomUUID(),employee_id:empIds[1],task_name:'Direct Deposit Setup',completed:true},
+    {id:crypto.randomUUID(),employee_id:empIds[1],task_name:'NDA Signed',completed:true},
+    {id:crypto.randomUUID(),employee_id:empIds[1],task_name:'TMS Training',completed:true},
+  ];
+
+  // Activity log
+  demo.activityLog = [
+    {id:crypto.randomUUID(),action:'INSERT',table_name:'entries',record_id:demo.entries[0].id,created_at:new Date(now-H*1).toISOString()},
+    {id:crypto.randomUUID(),action:'INSERT',table_name:'financial_flags',record_id:demo.flags[0].id,created_at:new Date(now-H*3).toISOString()},
+    {id:crypto.randomUUID(),action:'UPDATE',table_name:'legal_matters',record_id:demo.matters[0].id,created_at:new Date(now-H*4).toISOString()},
+    {id:crypto.randomUUID(),action:'INSERT',table_name:'entries',record_id:demo.entries[2].id,created_at:new Date(now-H*5).toISOString()},
+    {id:crypto.randomUUID(),action:'INSERT',table_name:'tasks',record_id:(demo.tasks[0]||{}).id||'',created_at:new Date(now-H*6).toISOString()},
+    {id:crypto.randomUUID(),action:'INSERT',table_name:'employees',record_id:empIds[0],created_at:new Date(now-H*8).toISOString()},
+    {id:crypto.randomUUID(),action:'UPDATE',table_name:'financial_flags',record_id:demo.flags[3].id,created_at:new Date(now-H*20).toISOString()},
+    {id:crypto.randomUUID(),action:'INSERT',table_name:'legal_deadlines',record_id:demo.deadlines[0].id,created_at:new Date(now-H*24).toISOString()},
+    {id:crypto.randomUUID(),action:'INSERT',table_name:'entries',record_id:demo.entries[6].id,created_at:new Date(now-H*18).toISOString()},
+    {id:crypto.randomUUID(),action:'DELETE',table_name:'tasks',record_id:crypto.randomUUID(),created_at:new Date(now-H*30).toISOString()},
+  ];
 }
 
 // ================================================================

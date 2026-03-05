@@ -14,7 +14,14 @@
       "Bash(git add -A)",
       "Bash(git commit:*)",
       "Bash(git push)",
-      "Bash(ls /d/kono-paddock/index.html*)"
+      "Bash(ls /d/kono-paddock/index.html*)",
+      "Bash(git rm index.html.html)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://akono88.github.io/kono-paddock/)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://hpprebdyvnfczplaaych.supabase.co/functions/v1/analyze)",
+      "Bash(curl -s https://hpprebdyvnfczplaaych.supabase.co/functions/v1/analyze)",
+      "Bash(npx supabase secrets list --project-ref hpprebdyvnfczplaaych)",
+      "Bash(curl -s https://hpprebdyvnfczplaaych.supabase.co/functions/v1/analyze -H \"Content-Type: application/json\" -d '{\"\"mode\"\":\"\"strategy\"\",\"\"content\"\":\"\"Test: Should I hire a dispatcher or use a load board?\"\"}')",
+      "mcp__Claude_Preview__preview_start"
     ]
   }
 }
