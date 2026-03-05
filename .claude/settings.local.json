@@ -4,7 +4,16 @@
       "Bash(npm install -g supabase)",
       "Bash(supabase --version)",
       "Bash(npx supabase --version)",
-      "Bash(npx supabase functions deploy generate-insights --project-ref hpprebdyvnfczplaaych)"
+      "Bash(npx supabase functions deploy generate-insights --project-ref hpprebdyvnfczplaaych)",
+      "Bash(npx supabase functions deploy generate-insights --project-ref hpprebdyvnfczplaaych --no-verify-jwt)",
+      "Bash(npx supabase functions list --project-ref hpprebdyvnfczplaaych)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" https://hpprebdyvnfczplaaych.supabase.co/functions/v1/generate-insights)",
+      "Bash(curl -s https://hpprebdyvnfczplaaych.supabase.co/functions/v1/generate-insights)",
+      "Bash(curl -s -X POST \"https://hpprebdyvnfczplaaych.supabase.co/rest/v1/rpc\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhwcHJlYmR5dm5mY3pwbGFheWNoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjY0ODU0MiwiZXhwIjoyMDg4MjI0NTQyfQ.YIek9CTlHSavmqqtMyFEZ0DU8MThNa5y41CctOlGWXg\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhwcHJlYmR5dm5mY3pwbGFheWNoIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc3MjY0ODU0MiwiZXhwIjoyMDg4MjI0NTQyfQ.YIek9CTlHSavmqqtMyFEZ0DU8MThNa5y41CctOlGWXg\" -H \"Content-Type: application/json\")",
+      "Bash(npx supabase functions deploy analyze --project-ref hpprebdyvnfczplaaych --no-verify-jwt)",
+      "Bash(git add -A)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
     ]
   }
 }
