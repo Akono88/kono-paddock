@@ -881,6 +881,73 @@ input, select, textarea { font-family: inherit; }
 .spinner-sm { width: 18px; height: 18px; border: 2px solid var(--carbon-600); border-top-color: var(--teal); border-radius: 50%; animation: spin 0.6s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .panel-loading { display: flex; align-items: center; justify-content: center; padding: 40px; }
+
+/* ================================================================
+   FILE UPLOAD — PADDOCK ATTACHMENTS
+   ================================================================ */
+.attach-row { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
+.attach-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 5px 12px;
+  background: transparent;
+  border: 1px dashed var(--carbon-500);
+  border-radius: var(--r-md);
+  color: var(--carbon-400);
+  font-family: var(--font-display);
+  font-size: 0.56rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.attach-btn:hover { border-color: var(--teal); color: var(--teal); background: var(--teal-dim); }
+.attach-btn .attach-icon { font-size: 0.82rem; }
+.attach-input { display: none; }
+.attach-preview { display: flex; flex-wrap: wrap; gap: 6px; flex: 1; }
+.attach-chip {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  background: var(--carbon-750);
+  border: 1px solid var(--carbon-600);
+  border-radius: var(--r-sm);
+  font-size: 0.7rem;
+  color: var(--carbon-300);
+  max-width: 200px;
+}
+.attach-chip .attach-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.attach-chip .attach-size { font-family: var(--font-display); font-size: 0.5rem; color: var(--carbon-500); flex-shrink: 0; }
+.attach-chip .attach-remove {
+  width: 16px; height: 16px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; color: var(--carbon-500);
+  font-size: 0.7rem; cursor: pointer; flex-shrink: 0; border-radius: 2px;
+  transition: all 0.1s;
+}
+.attach-chip .attach-remove:hover { color: var(--red); background: var(--red-dim); }
+.entry-files { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+.entry-file-link {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px;
+  background: var(--teal-dim);
+  border: 1px solid rgba(0,161,155,0.15);
+  border-radius: 2px;
+  font-family: var(--font-display);
+  font-size: 0.48rem;
+  font-weight: 600;
+  color: var(--teal);
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  transition: all 0.12s;
+}
+.entry-file-link:hover { background: var(--teal-med); border-color: var(--teal); }
+.entry-file-link .file-icon { font-size: 0.62rem; }
+.upload-progress {
+  height: 2px; background: var(--carbon-700); border-radius: 1px; overflow: hidden; margin-top: 6px; display: none;
+}
+.upload-progress.active { display: block; }
+.upload-progress-bar { height: 100%; background: var(--teal); width: 0%; transition: width 0.3s; }
 </style>
 </head>
 <body>
@@ -968,6 +1035,12 @@ input, select, textarea { font-family: inherit; }
             <textarea id="capture-input" class="capture-textarea" rows="3" placeholder="e.g. Check bond claim from Zurich for $3,200 — need docs by Friday"></textarea>
           </div>
           <div class="parse-suggestion" id="parse-box"><div class="parse-row" id="parse-content"></div></div>
+          <div class="attach-row">
+            <input type="file" id="attach-input" class="attach-input" multiple accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.json">
+            <button class="attach-btn" onclick="document.getElementById('attach-input').click()"><span class="attach-icon">&#128206;</span> Attach Files</button>
+            <div class="attach-preview" id="attach-preview"></div>
+          </div>
+          <div class="upload-progress" id="upload-progress"><div class="upload-progress-bar" id="upload-progress-bar"></div></div>
           <div class="capture-actions">
             <div class="capture-overrides">
               <select id="override-domain" class="override-select"><option value="">Auto Sector</option><option value="legal">Legal</option><option value="financial">Financial</option><option value="operations">Operations</option><option value="hr">HR</option><option value="personal">Personal</option><option value="general">General</option></select>
@@ -1213,6 +1286,28 @@ function renderParsePreview() {
   box.classList.add('visible');
 }
 
+// Drag-and-drop file support on capture terminal
+(function() {
+  var term = document.querySelector('.capture-terminal');
+  if (!term) return;
+  ['dragenter','dragover'].forEach(function(ev) {
+    term.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); term.style.borderColor = 'var(--teal)'; term.style.boxShadow = 'var(--teal-glow)'; });
+  });
+  ['dragleave','drop'].forEach(function(ev) {
+    term.addEventListener(ev, function(e) { e.preventDefault(); e.stopPropagation(); term.style.borderColor = ''; term.style.boxShadow = ''; });
+  });
+  term.addEventListener('drop', function(e) {
+    var files = Array.from(e.dataTransfer.files);
+    files.forEach(function(f) {
+      if (f.size > 10 * 1024 * 1024) { toast('File too large: ' + f.name + ' (max 10MB)', 'error'); return; }
+      if (pendingFiles.length >= 5) { toast('Max 5 files per entry', 'error'); return; }
+      pendingFiles.push(f);
+    });
+    renderAttachPreview();
+    if (pendingFiles.length) toast(pendingFiles.length + ' file' + (pendingFiles.length>1?'s':'') + ' attached', 'info');
+  });
+})();
+
 // ================================================================
 // SUBMIT CAPTURE
 // ================================================================
@@ -1230,19 +1325,34 @@ async function submitCapture() {
 
   if (isDemo) {
     entry.id = crypto.randomUUID(); entry.created_at = new Date().toISOString();
+    if (pendingFiles.length) {
+      entry.metadata.files = pendingFiles.map(function(f){ return { name: f.name, type: f.type, size: f.size, url: '#' }; });
+    }
     demo.entries.unshift(entry);
     toast('Transmitted \u2192 ' + parsed.domain, 'success');
     captureInput.value = ''; document.getElementById('parse-box').classList.remove('visible');
     document.getElementById('override-domain').value = ''; document.getElementById('override-priority').value = '';
-    loadRecentEntries(); return;
+    clearAttachments(); loadRecentEntries(); return;
   }
   try {
-    var r = await sb.from('entries').insert(Object.assign({}, entry, { user_id: user.id }));
+    // Insert entry first to get the ID
+    var r = await sb.from('entries').insert(Object.assign({}, entry, { user_id: user.id })).select('id').single();
     if (r.error) throw r.error;
-    toast('Transmitted \u2192 ' + parsed.domain, 'success');
+    var entryId = r.data.id;
+
+    // Upload files if any
+    if (pendingFiles.length) {
+      var uploaded = await uploadFiles(entryId);
+      if (uploaded.length) {
+        entry.metadata.files = uploaded;
+        await sb.from('entries').update({ metadata: entry.metadata }).eq('id', entryId);
+      }
+    }
+
+    toast('Transmitted \u2192 ' + parsed.domain + (pendingFiles.length ? ' (' + pendingFiles.length + ' file' + (pendingFiles.length>1?'s':'') + ')' : ''), 'success');
     captureInput.value = ''; document.getElementById('parse-box').classList.remove('visible');
     document.getElementById('override-domain').value = ''; document.getElementById('override-priority').value = '';
-    loadRecentEntries();
+    clearAttachments(); loadRecentEntries();
   } catch (e) { toast('Error: ' + e.message, 'error'); }
 }
 
@@ -1250,6 +1360,81 @@ document.addEventListener('keydown', function(e) {
   if ((e.metaKey || e.ctrlKey) && e.key === 'Enter' && currentView === 'capture') { e.preventDefault(); submitCapture(); }
   if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); switchView('capture'); }
 });
+
+// ================================================================
+// FILE ATTACHMENTS
+// ================================================================
+var pendingFiles = [];
+var STORAGE_BUCKET = 'paddock-files';
+
+document.getElementById('attach-input').addEventListener('change', function(e) {
+  var files = Array.from(e.target.files);
+  files.forEach(function(f) {
+    if (f.size > 10 * 1024 * 1024) { toast('File too large: ' + f.name + ' (max 10MB)', 'error'); return; }
+    if (pendingFiles.length >= 5) { toast('Max 5 files per entry', 'error'); return; }
+    pendingFiles.push(f);
+  });
+  renderAttachPreview();
+  e.target.value = '';
+});
+
+function renderAttachPreview() {
+  var el = document.getElementById('attach-preview');
+  if (!pendingFiles.length) { el.innerHTML = ''; return; }
+  el.innerHTML = pendingFiles.map(function(f, i) {
+    var size = f.size < 1024 ? f.size + 'B' : f.size < 1048576 ? (f.size/1024).toFixed(0) + 'KB' : (f.size/1048576).toFixed(1) + 'MB';
+    var icon = f.type.startsWith('image/') ? '&#128248;' : f.name.endsWith('.pdf') ? '&#128196;' : '&#128195;';
+    return '<div class="attach-chip"><span>'+icon+'</span><span class="attach-name">'+esc(f.name)+'</span><span class="attach-size">'+size+'</span><button class="attach-remove" onclick="removePendingFile('+i+')">&times;</button></div>';
+  }).join('');
+}
+
+function removePendingFile(i) {
+  pendingFiles.splice(i, 1);
+  renderAttachPreview();
+}
+
+async function uploadFiles(entryId) {
+  if (!pendingFiles.length || isDemo) return [];
+  var uploaded = [];
+  var bar = document.getElementById('upload-progress');
+  var barFill = document.getElementById('upload-progress-bar');
+  bar.classList.add('active');
+  for (var i = 0; i < pendingFiles.length; i++) {
+    barFill.style.width = ((i / pendingFiles.length) * 100) + '%';
+    var f = pendingFiles[i];
+    var ext = f.name.split('.').pop();
+    var path = user.id + '/' + entryId + '/' + Date.now() + '-' + i + '.' + ext;
+    try {
+      var r = await sb.storage.from(STORAGE_BUCKET).upload(path, f, { contentType: f.type, upsert: false });
+      if (r.error) { toast('Upload failed: ' + f.name, 'error'); continue; }
+      var pub = sb.storage.from(STORAGE_BUCKET).getPublicUrl(path);
+      uploaded.push({ name: f.name, path: path, url: pub.data.publicUrl, type: f.type, size: f.size });
+    } catch(e) { toast('Upload error: ' + e.message, 'error'); }
+  }
+  barFill.style.width = '100%';
+  setTimeout(function(){ bar.classList.remove('active'); barFill.style.width = '0%'; }, 600);
+  return uploaded;
+}
+
+function clearAttachments() {
+  pendingFiles = [];
+  renderAttachPreview();
+}
+
+function fileIconForType(type, name) {
+  if (type && type.startsWith('image/')) return '&#128248;';
+  if (name && name.endsWith('.pdf')) return '&#128196;';
+  if (name && (name.endsWith('.doc') || name.endsWith('.docx'))) return '&#128195;';
+  if (name && (name.endsWith('.xls') || name.endsWith('.xlsx') || name.endsWith('.csv'))) return '&#128202;';
+  return '&#128195;';
+}
+
+function renderFileChips(metadata) {
+  if (!metadata || !metadata.files || !metadata.files.length) return '';
+  return '<div class="entry-files">' + metadata.files.map(function(f) {
+    return '<a class="entry-file-link" href="'+esc(f.url)+'" target="_blank" rel="noopener" title="'+esc(f.name)+'"><span class="file-icon">'+fileIconForType(f.type, f.name)+'</span>'+esc(f.name.length > 20 ? f.name.substring(0,17) + '...' : f.name)+'</a>';
+  }).join('') + '</div>';
+}
 
 // ================================================================
 // DATA LOADERS
@@ -1318,7 +1503,8 @@ async function loadRecentEntries() {
 }
 
 function entryRowHTML(e, resolve) {
-  return '<div class="entry-row '+(e.resolved?'resolved':'')+'" '+(resolve?'onclick="toggleResolve(\''+e.id+'\')"':'')+'><span class="domain-dot '+e.domain+'"></span><div class="entry-body"><div class="entry-meta-line"><span class="entry-domain-tag">'+e.domain+'</span><span class="priority-pip '+e.priority+'">'+e.priority+'</span><span class="entry-time-tag">'+timeAgo(e.created_at)+'</span></div><div class="entry-text">'+esc(e.content)+'</div></div></div>';
+  var files = renderFileChips(e.metadata);
+  return '<div class="entry-row '+(e.resolved?'resolved':'')+'" '+(resolve?'onclick="toggleResolve(\''+e.id+'\')"':'')+'><span class="domain-dot '+e.domain+'"></span><div class="entry-body"><div class="entry-meta-line"><span class="entry-domain-tag">'+e.domain+'</span><span class="priority-pip '+e.priority+'">'+e.priority+'</span><span class="entry-time-tag">'+timeAgo(e.created_at)+'</span></div><div class="entry-text">'+esc(e.content)+'</div>'+files+'</div></div>';
 }
 
 async function toggleResolve(id) {
