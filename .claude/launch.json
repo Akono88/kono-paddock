@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "frontend",
+      "runtimeExecutable": "node",
+      "runtimeArgs": ["C:/Users/Uscb2/AppData/Roaming/npm/node_modules/serve/build/main.js", "-l", "3000", "."],
+      "port": 3000
+    }
+  ]
+}
