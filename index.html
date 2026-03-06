@@ -2523,7 +2523,7 @@ function parseInput(text) {
 
 var captureInput = document.getElementById('capture-input');
 var parseTimer = null;
-captureInput.addEventListener('input', function() { clearTimeout(parseTimer); parseTimer = setTimeout(renderParsePreview, 200); });
+if (captureInput) captureInput.addEventListener('input', function() { clearTimeout(parseTimer); parseTimer = setTimeout(renderParsePreview, 200); });
 
 function renderParsePreview() {
   var text = captureInput.value;
@@ -2630,7 +2630,8 @@ document.addEventListener('keydown', function(e) {
 var pendingFiles = [];
 var STORAGE_BUCKET = 'paddock-files';
 
-document.getElementById('attach-input').addEventListener('change', function(e) {
+var attachInput = document.getElementById('attach-input');
+if (attachInput) attachInput.addEventListener('change', function(e) {
   var files = Array.from(e.target.files);
   files.forEach(function(f) {
     if (f.size > 10 * 1024 * 1024) { toast('File too large: ' + f.name + ' (max 10MB)', 'error'); return; }
@@ -3032,7 +3033,8 @@ function setIntelMode(mode) {
   if (isHistory) { loadIntelHistory(); } else { document.getElementById('intel-results').classList.remove('visible'); }
 }
 
-document.getElementById('intel-file-input').addEventListener('change', function(e) {
+var intelFileInput = document.getElementById('intel-file-input');
+if (intelFileInput) intelFileInput.addEventListener('change', function(e) {
   var file = e.target.files[0];
   if (!file) return;
   if (file.size > 10 * 1024 * 1024) { toast('File too large (max 10MB)', 'error'); return; }
@@ -3115,7 +3117,7 @@ function renderIntelResults(mode, a) {
     h += '<div class="intel-result-text highlight">' + esc(a.subject_line || '') + '</div></div>';
 
     h += '<div class="intel-result-card"><div class="intel-result-label">Court-Safe Draft</div>';
-    h += '<div class="intel-draft-box" onclick="copyOFWDraft(this,'+JSON.stringify(JSON.stringify({subject_line:a.subject_line||'',rewritten_message:a.rewritten_message||''}))+')" title="Click to copy">' + esc(a.rewritten_message || '') + '</div>';
+    h += '<div class="intel-draft-box" onclick="copyOFWDraft(this,'+jsonAttr({subject_line:a.subject_line||'',rewritten_message:a.rewritten_message||''})+')" title="Click to copy">' + esc(a.rewritten_message || '') + '</div>';
     h += '<div class="intel-copy-hint">Click to copy to clipboard</div></div>';
 
     if (a.coaching_note) {
@@ -3149,7 +3151,7 @@ function renderIntelResults(mode, a) {
       h += '<div class="intel-result-text coaching">' + esc(a.strategic_note) + '</div></div>';
     }
     if ((a.risk_level || 0) >= 4) {
-      h += '<div class="intel-result-card" style="border:1px solid var(--red-med)"><button class="sheet-submit" style="background:var(--red);font-size:0.6rem;padding:8px 16px" onclick="emailDefenseAutoFlag('+JSON.stringify(JSON.stringify({actual_intent:a.actual_intent||'',risk_explanation:a.risk_explanation||''}))+')">\ud83d\udea8 Create Critical Flag</button></div>';
+      h += '<div class="intel-result-card" style="border:1px solid var(--red-med)"><button class="sheet-submit" style="background:var(--red);font-size:0.6rem;padding:8px 16px" onclick="emailDefenseAutoFlag('+jsonAttr({actual_intent:a.actual_intent||'',risk_explanation:a.risk_explanation||''})+')">\ud83d\udea8 Create Critical Flag</button></div>';
     }
 
   } else if (mode === 'doc_analysis') {
@@ -3161,12 +3163,12 @@ function renderIntelResults(mode, a) {
 
     if (a.dates_found && a.dates_found.length) {
       h += '<div class="intel-result-card"><div class="intel-result-label">Dates Found</div>';
-      a.dates_found.forEach(function(d, idx) { h += '<div class="intel-result-text" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span><span class="highlight">' + esc(d.date) + '</span> \u2014 ' + esc(d.context) + '</span><button class="suggest-pill" onclick="docAnalysisCreateDeadline('+JSON.stringify(JSON.stringify(d))+')">&#128197; Create Deadline</button></div>'; });
+      a.dates_found.forEach(function(d, idx) { h += '<div class="intel-result-text" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span><span class="highlight">' + esc(d.date) + '</span> \u2014 ' + esc(d.context) + '</span><button class="suggest-pill" onclick="docAnalysisCreateDeadline('+jsonAttr(d)+')">&#128197; Create Deadline</button></div>'; });
       h += '</div>';
     }
     if (a.amounts_found && a.amounts_found.length) {
       h += '<div class="intel-result-card"><div class="intel-result-label">Amounts Found</div>';
-      a.amounts_found.forEach(function(d, idx) { h += '<div class="intel-result-text" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span><span style="color:var(--green);font-weight:700">' + esc(d.amount) + '</span> \u2014 ' + esc(d.context) + '</span><button class="suggest-pill" onclick="docAnalysisCreateFlag('+JSON.stringify(JSON.stringify(d))+')">&#128176; Create Financial Flag</button></div>'; });
+      a.amounts_found.forEach(function(d, idx) { h += '<div class="intel-result-text" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span><span style="color:var(--green);font-weight:700">' + esc(d.amount) + '</span> \u2014 ' + esc(d.context) + '</span><button class="suggest-pill" onclick="docAnalysisCreateFlag('+jsonAttr(d)+')">&#128176; Create Financial Flag</button></div>'; });
       h += '</div>';
     }
     if (a.contradictions && a.contradictions.length) {
@@ -4219,6 +4221,7 @@ function timeAgo(ds) {
 }
 
 function esc(str) { if (!str) return ''; var d = document.createElement('div'); d.textContent = str; return d.innerHTML; }
+function jsonAttr(obj) { return "'" + JSON.stringify(obj).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;') + "'"; }
 
 function toast(msg, type) {
   type = type || 'info';

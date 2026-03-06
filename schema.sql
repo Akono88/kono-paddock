@@ -386,3 +386,144 @@ SELECT
   (SELECT COUNT(*) FROM ai_insights ai WHERE ai.user_id = u.id AND ai.acknowledged = FALSE) AS unread_insights,
   (SELECT COUNT(*) FROM employees emp WHERE emp.user_id = u.id AND emp.is_active = TRUE) AS active_employees
 FROM auth.users u;
+
+-- ============================================================
+-- 8. CALENDAR EVENTS
+--    Kono Paddock V2 — Calendar Module
+-- ============================================================
+
+CREATE TABLE IF NOT EXISTS calendar_events (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id     UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  title       TEXT NOT NULL,
+  event_date  DATE NOT NULL,
+  event_time  TIME,
+  event_type  TEXT NOT NULL DEFAULT 'task'
+              CHECK (event_type IN ('deadline','court_date','exchange','task','meeting','flag')),
+  domain      TEXT NOT NULL DEFAULT 'general'
+              CHECK (domain IN ('legal','financial','operations','hr','personal','general')),
+  description TEXT,
+  source      TEXT,            -- e.g. 'manual', 'legal_deadline', 'task'
+  repeat_rule TEXT,            -- e.g. 'weekly', 'biweekly', 'monthly', null
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+CREATE INDEX idx_calendar_events_user    ON calendar_events (user_id);
+CREATE INDEX idx_calendar_events_date    ON calendar_events (event_date);
+CREATE INDEX idx_calendar_events_user_dt ON calendar_events (user_id, event_date);
+
+ALTER TABLE calendar_events ENABLE ROW LEVEL SECURITY;
+
+CREATE POLICY "Users can view own calendar events"
+  ON calendar_events FOR SELECT
+  USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can insert own calendar events"
+  ON calendar_events FOR INSERT
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own calendar events"
+  ON calendar_events FOR UPDATE
+  USING (auth.uid() = user_id)
+  WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own calendar events"
+  ON calendar_events FOR DELETE
+  USING (auth.uid() = user_id);
+
+-- ============================================================
+-- 9. CASCADE TRIGGER
+--    Auto-creates downstream objects from guided intake entries
+-- ============================================================
+
+DROP TRIGGER IF EXISTS entry_cascade ON entries;
+DROP FUNCTION IF EXISTS cascade_entry_actions();
+
+CREATE OR REPLACE FUNCTION cascade_entry_actions()
+RETURNS TRIGGER AS $$
+BEGIN
+  -- AUTO-CREATE TASK
+  IF NEW.metadata->>'next_action' IS NOT NULL
+     AND NEW.is_actionable = TRUE THEN
+    INSERT INTO tasks (
+      user_id, title, description, domain, priority,
+      status, linked_entry_id, tags
+    ) VALUES (
+      NEW.user_id,
+      NEW.metadata->>'next_action',
+      NEW.content,
+      NEW.domain,
+      NEW.priority,
+      'pending',
+      NEW.id,
+      NEW.tags
+    );
+  END IF;
+
+  -- AUTO-CREATE FINANCIAL FLAG
+  IF NEW.metadata->>'flag_type' IS NOT NULL
+     AND NEW.metadata->>'amount' IS NOT NULL THEN
+    INSERT INTO financial_flags (
+      user_id, flag_type, title, amount, source_system, status
+    ) VALUES (
+      NEW.user_id,
+      (NEW.metadata->>'flag_type')::financial_flag_type,
+      LEFT(NEW.content, 120),
+      (regexp_replace(NEW.metadata->>'amount', '[$,]', '', 'g'))::decimal,
+      'paddock-intake',
+      'pending'
+    );
+  END IF;
+
+  -- AUTO-FLAG CC VIOLATION (Janes Protocol)
+  IF (NEW.metadata->>'cc_flag')::boolean = TRUE THEN
+    INSERT INTO legal_communications (
+      user_id, from_party, to_party, subject,
+      summary, was_copied, flagged, communication_date
+    ) VALUES (
+      NEW.user_id,
+      COALESCE(NEW.metadata->>'from_party', 'Opposing Counsel'),
+      COALESCE(NEW.metadata->>'to_party', 'Attorney'),
+      COALESCE(NEW.metadata->>'comm_subject', 'CC Violation — Auto-flagged'),
+      NEW.content,
+      FALSE,
+      TRUE,
+      NOW()
+    );
+  END IF;
+
+  -- AUTO-CREATE LEGAL DEADLINE
+  IF NEW.metadata->>'deadline_hint' IS NOT NULL
+     AND NEW.domain = 'legal' THEN
+    INSERT INTO legal_deadlines (
+      user_id, title, description, deadline_date,
+      priority, completed
+    ) VALUES (
+      NEW.user_id,
+      COALESCE(NEW.metadata->>'next_action', LEFT(NEW.content, 80)),
+      NEW.content,
+      CASE
+        WHEN NEW.metadata->>'deadline_hint' ~* 'today' THEN NOW()
+        WHEN NEW.metadata->>'deadline_hint' ~* 'tomorrow' THEN NOW() + INTERVAL '1 day'
+        WHEN NEW.metadata->>'deadline_hint' ~* 'friday' THEN
+          NOW() + ((5 - EXTRACT(DOW FROM NOW()) + 7)::int % 7) * INTERVAL '1 day'
+        WHEN NEW.metadata->>'deadline_hint' ~* 'eow|end of week' THEN
+          NOW() + ((5 - EXTRACT(DOW FROM NOW()) + 7)::int % 7) * INTERVAL '1 day'
+        WHEN NEW.metadata->>'deadline_hint' ~* 'eod|end of day' THEN
+          DATE_TRUNC('day', NOW()) + INTERVAL '17 hours'
+        WHEN NEW.metadata->>'deadline_hint' ~* '(\d+)\s*days?' THEN
+          NOW() + (SUBSTRING(NEW.metadata->>'deadline_hint' FROM '(\d+)')::int * INTERVAL '1 day')
+        ELSE NOW() + INTERVAL '7 days'
+      END,
+      NEW.priority,
+      FALSE
+    );
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+CREATE TRIGGER entry_cascade
+  AFTER INSERT ON entries
+  FOR EACH ROW EXECUTE FUNCTION cascade_entry_actions();
