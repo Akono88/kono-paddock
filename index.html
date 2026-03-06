@@ -3331,9 +3331,10 @@ async function docAnalysisCreateFlag(jsonStr) {
 }
 
 // Briefing — Act on This
-function actOnInsight(id) {
-  var allInsights = isDemo ? demo.insights : [];
-  var insight = allInsights.find(function(i) { return i.id === id; });
+async function actOnInsight(id) {
+  var insight = null;
+  if (isDemo) { insight = demo.insights.find(function(i) { return i.id === id; }); }
+  else { try { var r = await sb.from('ai_insights').select('*').eq('id', id).single(); insight = r.data; } catch(e) {} }
   if (!insight) return;
   switchView('capture');
   toggleInsights();
@@ -3384,9 +3385,10 @@ function renderIntelHistory(items) {
   el.classList.add('visible');
 }
 
-function replayIntelHistory(id) {
-  var items = isDemo ? demo.insights : [];
-  var item = items.find(function(i) { return i.id === id; });
+async function replayIntelHistory(id) {
+  var item = null;
+  if (isDemo) { item = demo.insights.find(function(i) { return i.id === id; }); }
+  else { try { var r = await sb.from('ai_insights').select('*').eq('id', id).single(); item = r.data; } catch(e) {} }
   if (!item) return;
   var mode = (item.metadata && item.metadata.mode) || item.insight_type || 'ofw_draft';
   try {
